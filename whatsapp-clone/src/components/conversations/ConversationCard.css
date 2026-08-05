@@ -1,0 +1,179 @@
+/* ConversationCard.css */
+
+:root {
+  --card-bg: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --radius: 16px;
+  --shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  --shadow-hover: 0 16px 36px rgba(15, 23, 42, 0.14);
+  --border: rgba(15, 23, 42, 0.08);
+  --green: #10b981;
+  --orange: #f97316;
+  --gray: #64748b;
+}
+
+.conversation-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  cursor: pointer;
+  text-align: left;
+}
+
+.conversation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(43, 140, 255, 0.18);
+}
+
+.conversation-card__left {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.conversation-card__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2b8cff 0%, #00c6ff 100%);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 20px;
+  overflow: hidden;
+}
+
+.conversation-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.conversation-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.conversation-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.conversation-card__header h4 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-card__time {
+  font-size: 12px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.conversation-card__preview {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversation-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.conversation-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.conversation-card__badge--open {
+  background: #10b981;
+}
+
+.conversation-card__badge--pending {
+  background: #f97316;
+}
+
+.conversation-card__badge--closed {
+  background: #64748b;
+}
+
+.conversation-card__agent {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.conversation-card__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.conversation-card__unread {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.conversation-card__right svg {
+  color: #64748b;
+  font-size: 18px;
+}
+
+@media (max-width: 720px) {
+  .conversation-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .conversation-card__right {
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+
+  .conversation-card__preview {
+    white-space: normal;
+    max-width: 100%;
+  }
+}

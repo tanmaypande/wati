@@ -1,0 +1,123 @@
+/* ContactCard.css - styles for each contact card */
+
+:root{
+  --primary-gradient: linear-gradient(90deg,#2b8cff 0%, #00c6ff 100%);
+  --card-bg: #ffffff;
+  --muted: #6b7280;
+  --radius: 12px;
+  --shadow: 0 6px 18px rgba(32,45,74,0.08);
+  --shadow-hover: 0 12px 30px rgba(32,45,74,0.12);
+}
+
+.contact-card{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:14px;
+  position:relative;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.contact-card:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--shadow-hover);
+}
+
+.contact-card__menu{
+  position:absolute;
+  right:10px;
+  top:10px;
+  background:transparent;
+  border:0;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:18px;
+}
+
+.contact-card__main{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.contact-card__avatar{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  overflow:hidden;
+  flex:0 0 56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--primary-gradient);
+}
+.contact-card__avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.contact-card__initial{
+  color:white;
+  font-weight:700;
+  font-size:20px;
+  font-family:inherit;
+}
+
+.contact-card__info{
+  flex:1 1 auto;
+  min-width:0;
+}
+.contact-card__name{
+  font-weight:600;
+  font-size:16px;
+  color:#0f172a;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.contact-card__meta{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:4px;
+}
+
+.contact-card__actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  justify-content:flex-end;
+  margin-top:4px;
+}
+
+.btn{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:8px 12px;
+  border-radius:8px;
+  border:0;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.btn--ghost{
+  background:transparent;
+  color:#0f172a;
+  border:1px solid rgba(15,23,42,0.06);
+}
+
+.btn--danger{
+  background:#ffecec;
+  color:#b91c1c;
+  border:1px solid rgba(185,28,28,0.08);
+}
+
+/* Responsive: make actions appear inline on small widths */
+@media (max-width:520px){
+  .contact-card{padding:12px}
+  .contact-card__actions{justify-content:flex-start;flex-wrap:wrap}
+  .btn{padding:8px 10px;font-size:12px}
+}

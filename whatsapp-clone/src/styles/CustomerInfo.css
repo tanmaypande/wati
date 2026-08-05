@@ -1,0 +1,74 @@
+.customer-info {
+    height: 100%;
+    background: white;
+    overflow-y: auto;
+}
+
+.customer-profile {
+    text-align: center;
+    padding: 30px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.customer-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.customer-profile h2 {
+    margin: 10px 0 5px;
+    font-size: 22px;
+}
+
+.customer-status {
+    color: green;
+    font-size: 14px;
+}
+
+.info-section {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.info-section h3 {
+    margin-bottom: 15px;
+    color: #233d74;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: #555;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tag {
+    background: #25d366;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    resize: none;
+    outline: none;
+    font-size: 14px;
+}

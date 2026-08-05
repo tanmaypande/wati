@@ -1,0 +1,88 @@
+/* ConversationFilters.css */
+
+:root {
+  --card-bg: #ffffff;
+  --muted: #64748b;
+  --radius: 14px;
+  --border: rgba(15, 23, 42, 0.08);
+}
+
+.conversation-filters {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+}
+
+.conversation-filters__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 280px;
+  min-width: 240px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+}
+
+.conversation-filters__icon {
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.conversation-filters__search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.conversation-filters__selects {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.conversation-filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  min-width: 140px;
+}
+
+.conversation-filters__field span {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.conversation-filters__field select {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--card-bg);
+  color: #0f172a;
+  font-size: 14px;
+  outline: none;
+}
+
+@media (max-width: 760px) {
+  .conversation-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .conversation-filters__selects {
+    width: 100%;
+  }
+
+  .conversation-filters__field {
+    min-width: 100%;
+  }
+}

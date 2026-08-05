@@ -1,0 +1,50 @@
+/* ContactForm.css */
+
+:root{
+  --primary-gradient: linear-gradient(90deg,#2b8cff 0%, #00c6ff 100%);
+  --card-bg:#ffffff;
+  --muted:#6b7280;
+  --radius:12px;
+}
+
+.cf-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(2,6,23,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:999;
+}
+
+.cf-modal{
+  width:100%;
+  max-width:520px;
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:0 20px 50px rgba(2,6,23,0.3);
+}
+
+.cf-title{margin:0 0 10px 0;font-size:18px}
+
+.cf-form{display:flex;flex-direction:column;gap:12px}
+.cf-field{display:flex;flex-direction:column;gap:6px}
+.cf-label{font-size:13px;color:var(--muted)}
+.cf-field input{padding:10px;border-radius:8px;border:1px solid rgba(15,23,42,0.06);outline:none}
+.cf-field input:focus{box-shadow:0 6px 18px rgba(43,140,255,0.08);border-color:rgba(43,140,255,0.18)}
+
+.cf-error{color:#b91c1c;font-size:12px}
+
+.cf-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+
+.btn{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+.btn--ghost{background:transparent;border:1px solid rgba(15,23,42,0.06)}
+.btn--primary{background:var(--primary-gradient);color:white;font-weight:600}
+
+@media (max-width:520px){
+  .cf-modal{padding:16px}
+  .cf-actions{flex-direction:column-reverse}
+  .btn{width:100%}
+}

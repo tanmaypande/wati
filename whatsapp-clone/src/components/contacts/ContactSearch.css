@@ -1,0 +1,56 @@
+/* ContactSearch.css */
+
+:root{
+  --primary-gradient: linear-gradient(90deg,#2b8cff 0%, #00c6ff 100%);
+  --radius: 12px;
+  --muted: #6b7280;
+}
+
+.contact-search{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.contact-search__input{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:1 1 auto;
+  background:rgba(15,23,42,0.03);
+  padding:8px 12px;
+  border-radius:10px;
+}
+
+.contact-search__icon{
+  color:var(--muted);
+  font-size:18px;
+}
+
+.contact-search__input input{
+  border:0;
+  background:transparent;
+  outline:none;
+  font-size:14px;
+  color:#0f172a;
+  width:100%;
+}
+
+.btn--primary{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  background:var(--primary-gradient);
+  color:white;
+  border:0;
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+@media (max-width:640px){
+  .contact-search{flex-direction:column;align-items:stretch}
+  .btn--primary{width:100%}
+}

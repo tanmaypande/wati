@@ -1,0 +1,33 @@
+/* EmptyContacts.css */
+
+:root{
+  --primary-gradient: linear-gradient(90deg,#2b8cff 0%, #00c6ff 100%);
+  --muted:#6b7280;
+}
+
+.empty-contacts{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:28px;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(43,140,255,0.05), rgba(0,198,255,0.02));
+  text-align:center;
+}
+
+.empty-contacts__ill{
+  width:96px;height:96px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--primary-gradient);color:white;font-size:36px
+}
+
+.empty-contacts h3{margin:0;font-size:18px}
+.empty-contacts p{margin:0;color:var(--muted)}
+
+.btn{display:inline-flex;gap:8px;align-items:center;padding:10px 14px;border-radius:10px;border:0;cursor:pointer}
+.btn--primary{background:var(--primary-gradient);color:white;font-weight:600}
+
+@media (max-width:520px){
+  .empty-contacts{padding:20px}
+  .empty-contacts__ill{width:80px;height:80px}
+}

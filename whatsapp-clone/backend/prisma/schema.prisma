@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  password       String
+  role           UserRole        @default(AGENT)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  conversations  Conversation[]
+  passwordResets PasswordReset[]
+  refreshTokens  RefreshToken[]
+  sessions       Session[]
+}
+
+model Contact {
+  id            String         @id @default(cuid())
+  name          String
+  phone         String         @unique
+  email         String?
+  profileImage  String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  conversations Conversation[]
+}
+
+model Conversation {
+  id           String             @id @default(cuid())
+  contactId    String
+  assignedToId String?
+  status       ConversationStatus @default(OPEN)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  assignedTo   User?              @relation(fields: [assignedToId], references: [id])
+  contact      Contact            @relation(fields: [contactId], references: [id])
+  messages     Message[]
+
+  @@index([contactId])
+  @@index([assignedToId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  sender         SenderType
+  content        String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId])
+}
+
+model Template {
+  id        String   @id @default(cuid())
+  name      String
+  category  String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Broadcast {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  userId    String
+  ip        String?
+  userAgent String?
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
+}
+
+enum UserRole {
+  ADMIN
+  AGENT
+}
+
+enum ConversationStatus {
+  OPEN
+  CLOSED
+  PENDING
+}
+
+enum SenderType {
+  AGENT
+  CUSTOMER
+}

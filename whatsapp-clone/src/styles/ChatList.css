@@ -1,0 +1,135 @@
+.chat-list {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+.chat-list-header {
+    padding: 20px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.chat-list-header h2 {
+    margin: 0;
+    color: #233d74;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    margin: 15px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f7f7f7;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    margin-left: 10px;
+    font-size: 15px;
+}
+
+.search-icon {
+    color: #888;
+}
+
+.chat-filters {
+    display: flex;
+    gap: 10px;
+    padding: 0 15px 15px;
+}
+
+.chat-filters button {
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    background: #e9ecef;
+    transition: 0.3s;
+}
+
+.chat-filters .active {
+    background: #25D366;
+    color: white;
+}
+
+.chat-items {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.chat-item:hover {
+    background: #f8f9fa;
+}
+
+.chat-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-info {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.chat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-top h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.chat-top span {
+    font-size: 12px;
+    color: gray;
+}
+
+.chat-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.chat-bottom p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 200px;
+}
+
+.unread-badge {
+    background: #25D366;
+    color: white;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}

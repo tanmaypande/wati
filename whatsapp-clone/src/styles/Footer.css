@@ -1,0 +1,51 @@
+.footer {
+height: 100px;
+background-color: #1643b5;
+color: white;
+padding: 20px 40px;
+margin-top: auto;
+}
+
+.footer-container {
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+gap: 20px;
+width: 100%;
+}
+
+.footer-logo h2 {
+margin: 0;
+color: #25D366;
+}
+.footer-logo span {
+    color: #f7faf9;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.footer-logo p {
+color: #cbd5e1;
+font-size: 14px;
+}
+
+.footer-links {
+display: flex;
+gap: 20px;
+}
+
+.footer-links a {
+color: white;
+text-decoration: none;
+transition: 0.3s;
+}
+
+.footer-links a:hover {
+color: #25D366;
+}
+
+.footer-copy {
+color: #9ca3af;
+font-size: 14px;
+}

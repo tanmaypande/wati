@@ -1,0 +1,64 @@
+/* EmptyConversation.css */
+
+:root {
+  --primary-gradient: linear-gradient(90deg, #2b8cff 0%, #00c6ff 100%);
+  --muted: #64748b;
+  --radius: 18px;
+}
+
+.empty-conversation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radius);
+  background: rgba(43, 140, 255, 0.05);
+  padding: 36px 24px;
+  color: #0f172a;
+}
+
+.empty-conversation__icon {
+  width: 90px;
+  height: 90px;
+  border-radius: 24px;
+  background: var(--primary-gradient);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 36px;
+  margin-bottom: 18px;
+}
+
+.empty-conversation h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.empty-conversation p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.empty-conversation__button {
+  margin-top: 18px;
+  border: none;
+  background: linear-gradient(90deg, #2b8cff 0%, #00c6ff 100%);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@media (max-width: 520px) {
+  .empty-conversation {
+    padding: 28px 18px;
+  }
+
+  .empty-conversation__icon {
+    width: 80px;
+    height: 80px;
+  }
+}
