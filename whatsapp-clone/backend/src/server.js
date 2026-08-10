@@ -8,6 +8,8 @@ const dashboardRoutes = require('./routes/dashboard');
 const authRoutes = require('./routes/auth');
 const contactsRoutes = require('./routes/contacts');
 const conversationsRoutes = require('./routes/conversations');
+const templatesRoutes = require('./routes/templates');
+const broadcastsRoutes = require('./routes/broadcasts');
 const { attachSocket } = require('./socket/socketHandler');
 const prisma = require('./config/prismaClient');
 
@@ -32,6 +34,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/contacts', contactsRoutes);
 app.use('/api/conversations', conversationsRoutes);
+app.use('/api/templates', templatesRoutes);
+app.use('/api/broadcasts', broadcastsRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => res.json({ status: 'ok' }));

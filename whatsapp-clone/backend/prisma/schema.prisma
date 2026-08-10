@@ -65,6 +65,8 @@ model Template {
   body      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  language  String   @default("English")
+  status    String   @default("PENDING")
 }
 
 model Broadcast {

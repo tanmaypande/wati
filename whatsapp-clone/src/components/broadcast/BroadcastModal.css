@@ -1,0 +1,138 @@
+.broadcast-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 999;
+}
+
+.broadcast-modal {
+  width: 100%;
+  max-width: 720px;
+  background: white;
+  border-radius: 22px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
+  padding: 28px;
+}
+
+.broadcast-modal__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.broadcast-modal__header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+.broadcast-modal__header p {
+  margin: 8px 0 0;
+  color: #64748b;
+  max-width: 600px;
+}
+
+.broadcast-modal__close {
+  border: none;
+  color: #0f172a;
+  font-size: 1.5rem;
+  background: transparent;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.broadcast-modal__body {
+  display: grid;
+  gap: 20px;
+}
+
+.broadcast-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.broadcast-modal__field label {
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.broadcast-modal__field input,
+.broadcast-modal__field textarea {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  resize: vertical;
+  background: #f8fafc;
+}
+
+.broadcast-modal__field input:focus,
+.broadcast-modal__field textarea:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.broadcast-modal__counter {
+  text-align: right;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.broadcast-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.broadcast-modal__cancel,
+.broadcast-modal__send {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.broadcast-modal__cancel {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.broadcast-modal__send {
+  background: #2563eb;
+  color: white;
+}
+
+.broadcast-modal__send:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+  .broadcast-modal__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .broadcast-modal__footer {
+    justify-content: stretch;
+  }
+
+  .broadcast-modal__cancel,
+  .broadcast-modal__send {
+    width: 100%;
+  }
+}
