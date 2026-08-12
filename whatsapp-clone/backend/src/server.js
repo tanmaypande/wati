@@ -40,6 +40,20 @@ app.use('/api/broadcasts', broadcastsRoutes);
 // Basic health check
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
+// Lightweight DB health/wake-up endpoint. This performs a minimal query
+// through Prisma so that Neon receives a real DB request and can wake if suspended.
+app.get('/api/health/db', async (req, res) => {
+  try {
+    // Execute a minimal raw query. `$queryRaw` is lightweight and sufficient to
+    // verify connectivity without loading any application data.
+    await prisma.$queryRaw`SELECT 1`;
+    return res.json({ success: true, database: 'connected' });
+  } catch (err) {
+    // Do not expose internal error details or credentials. Return a safe status.
+    return res.status(503).json({ success: false, database: 'unavailable' });
+  }
+});
+
 // Global error handler with mapping support
 app.use((err, req, res, next) => {
   // If handler receives an error with a status, use it; otherwise 500
