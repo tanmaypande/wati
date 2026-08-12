@@ -1,7 +1,7 @@
 import TopBar from "./topbar";
 import Sidebar from "./sidebar";
 import Footer from "./Footer";
-import "../../styles/Layout.css";
+import "../../styles/layout.css";
 
 function Layout({ children }) {
 return (
