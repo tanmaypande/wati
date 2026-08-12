@@ -1,6 +1,6 @@
 import './App.css'
 import { BrowserRouter, useLocation } from "react-router-dom";
-import Layout from "./components/layout/Layout";
+import Layout from "./components/Layout/Layout";
 import AppRoutes from "./routes/AppRoutes";
 
 
