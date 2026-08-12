@@ -64,19 +64,22 @@ async function getMessagesPerDay(days = 7) {
   const since = new Date();
   since.setDate(since.getDate() - (days - 1));
 
-  // Raw query for flexibility across postgres date_trunc
+  // Raw query grouping by day and sender so we can split sent/received
   const result = await prisma.$queryRaw(Prisma.sql`
-    SELECT DATE("createdAt") as day, COUNT(*) as count
+    SELECT DATE("createdAt") as day, "sender" as sender, COUNT(*) as count
     FROM "Message"
     WHERE "createdAt" >= ${since}
-    GROUP BY day
+    GROUP BY day, sender
     ORDER BY day ASC
   `);
 
-  // Normalize result to ensure all days are present
+  // Organize by day
   const map = {};
   result.forEach((r) => {
-    map[r.day.toISOString().slice(0, 10)] = Number(r.count);
+    const key = r.day.toISOString().slice(0, 10);
+    if (!map[key]) map[key] = { sent: 0, received: 0 };
+    if ((r.sender || '').toUpperCase() === 'AGENT') map[key].sent = Number(r.count);
+    else map[key].received = Number(r.count);
   });
 
   const points = [];
@@ -84,7 +87,9 @@ async function getMessagesPerDay(days = 7) {
     const d = new Date(since);
     d.setDate(since.getDate() + i);
     const key = d.toISOString().slice(0, 10);
-    points.push({ day: key, count: map[key] || 0 });
+    const sent = (map[key] && map[key].sent) || 0;
+    const received = (map[key] && map[key].received) || 0;
+    points.push({ day: key, sent, received, count: sent + received });
   }
 
   return points;

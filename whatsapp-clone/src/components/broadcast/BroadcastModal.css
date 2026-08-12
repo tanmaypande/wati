@@ -7,11 +7,16 @@
   justify-content: center;
   padding: 20px;
   z-index: 999;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .broadcast-modal {
   width: 100%;
   max-width: 720px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   background: white;
   border-radius: 22px;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
@@ -50,6 +55,9 @@
 .broadcast-modal__body {
   display: grid;
   gap: 20px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .broadcast-modal__field {

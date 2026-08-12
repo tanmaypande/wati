@@ -29,3 +29,28 @@ export async function resetPassword(token, newPassword) {
   const resp = await api.post('/auth/reset-password', { token, newPassword });
   return resp.data;
 }
+
+// Get current authenticated user's profile
+export async function getProfile() {
+  const resp = await api.get('/auth/me');
+  return resp.data.data;
+}
+
+// Change password for current user
+export async function changePassword(payload) {
+  // payload: { currentPassword, newPassword }
+  const resp = await api.post('/auth/change-password', payload);
+  return resp.data;
+}
+
+export async function verifyEmail(payload) {
+  // payload: { email, otp }
+  const resp = await api.post('/auth/verify-email', payload);
+  return resp.data.data;
+}
+
+export async function resendVerification(payload) {
+  // payload: { email }
+  const resp = await api.post('/auth/resend-verification', payload);
+  return resp.data.data;
+}

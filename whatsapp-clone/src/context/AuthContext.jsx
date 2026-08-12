@@ -20,10 +20,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = useCallback(async (payload) => {
+    // Registration now initiates email verification and does not log the user in.
     const resp = await apiRegister(payload);
-    setAccessToken(resp.accessToken);
-    setRefreshToken(resp.refreshToken);
-    setUser(resp.user);
     return resp;
   }, []);
 

@@ -14,14 +14,26 @@ export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const validateEmail = (raw) => {
+    if (!raw) return false;
+    const s = raw.trim().toLowerCase();
+    const re = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    return re.test(s);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
     setLoading(true);
     try {
-      await register({ name, email, password });
-      // After successful registration navigate to dashboard
-      navigate('/dashboard', { replace: true });
+      const normalizedEmail = email.trim().toLowerCase();
+      await register({ name, email: normalizedEmail, password });
+      // Navigate to verify-email page where user can enter the OTP
+      navigate('/verify-email', { state: { email: normalizedEmail } });
     } catch (err) {
       setError(err?.response?.data?.message || err.message || 'Registration failed');
     } finally {

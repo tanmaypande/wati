@@ -13,9 +13,9 @@ return (
 
         <div className="footer-links">
         <a href="#">Home</a>
-        <a href="#">Dashboard</a>
+        <a href="/dashboard">Dashboard</a>
         <a href="#">Pricing</a>
-        <a href="#">Support</a>
+        <a href="/setting">Support</a>
         </div>
 
         <div className="footer-copy">

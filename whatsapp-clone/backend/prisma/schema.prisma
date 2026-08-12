@@ -112,6 +112,21 @@ model PasswordReset {
   @@index([userId])
 }
 
+model EmailVerification {
+  id           String    @id @default(cuid())
+  email        String
+  otpHash      String
+  expiresAt    DateTime
+  attempts     Int       @default(0)
+  used         Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  lastSentAt   DateTime?
+  name         String
+  passwordHash String
+
+  @@index([email])
+}
+
 model playing_with_neon {
   id    Int    @id @default(autoincrement())
   name  String

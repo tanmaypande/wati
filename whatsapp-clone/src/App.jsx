@@ -6,7 +6,7 @@ import "./styles/Layout.css";
 
 function AppContent() {
   const location = useLocation();
-  const hideLayout = location.pathname === '/login';
+  const hideLayout = ['/login', '/register', '/verify-email', '/'].includes(location.pathname);
 
   if (hideLayout) {
     return <AppRoutes />;

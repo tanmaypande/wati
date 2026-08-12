@@ -16,9 +16,36 @@ async function register(req, res) {
   try {
     const { name, email, password } = req.body;
     const result = await authService.register({ name, email, password });
+    // result: { message: 'Verification code sent' }
     return res.status(201).json({ success: true, data: result });
   } catch (err) {
     console.error('Register error', err);
+    const status = mapErrorToStatus(err);
+    return res.status(status).json({ success: false, message: err.message });
+  }
+}
+
+// Verify email OTP and create user after successful verification
+async function verifyEmail(req, res) {
+  try {
+    const { email, otp } = req.body;
+    const result = await authService.verifyEmail({ email, otp });
+    return res.json({ success: true, data: result });
+  } catch (err) {
+    console.error('Verify email error', err);
+    const status = mapErrorToStatus(err);
+    return res.status(status).json({ success: false, message: err.message });
+  }
+}
+
+// Resend verification code
+async function resendVerification(req, res) {
+  try {
+    const { email } = req.body;
+    const result = await authService.resendVerification({ email });
+    return res.json({ success: true, data: result });
+  } catch (err) {
+    console.error('Resend verification error', err);
     const status = mapErrorToStatus(err);
     return res.status(status).json({ success: false, message: err.message });
   }
@@ -114,6 +141,8 @@ async function changePassword(req, res) {
 
 module.exports = {
   register,
+  verifyEmail,
+  resendVerification,
   login,
   refresh,
   logout,

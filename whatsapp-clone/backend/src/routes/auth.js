@@ -11,6 +11,10 @@ router.post('/logout', controller.logout);
 router.post('/forgot-password', controller.forgotPassword);
 router.post('/reset-password', controller.resetPassword);
 
+// Email verification endpoints
+router.post('/verify-email', controller.verifyEmail);
+router.post('/resend-verification', controller.resendVerification);
+
 // Protected routes - require a valid access token in Authorization: Bearer <token>
 router.get('/me', authenticate, controller.me);
 router.post('/change-password', authenticate, controller.changePassword);
