@@ -2,7 +2,7 @@ import './App.css'
 import { BrowserRouter, useLocation } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import AppRoutes from "./routes/AppRoutes";
-import "./styles/Layout.css";
+
 
 function AppContent() {
   const location = useLocation();

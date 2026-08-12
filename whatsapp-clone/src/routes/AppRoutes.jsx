@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 
-import Dashboard from "../pages/dashboard";
+import Dashboard from "../pages/Dashboard";
 import Chats from "../pages/chats";
 import Contacts from "../pages/Contacts";
 import Login from "../pages/Login";

@@ -22,7 +22,8 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.22",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "vite": "^8.2.1"
   },
   "description": "",
   "keywords": [],
