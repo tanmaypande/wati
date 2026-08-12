@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { signAccessToken, signRefreshToken } = require('../utils/jwt');
 const { isValidEmail } = require('../utils/validation');
-const { v4: uuidv4 } = require('uuid');
 
 const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10);
 
@@ -307,7 +306,7 @@ async function logout({ token }) {
 async function forgotPassword({ email }) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return true;
-  const token = uuidv4();
+  const token = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
   await prisma.passwordReset.create({ data: { userId: user.id, token, expiresAt } });
   return { token };
