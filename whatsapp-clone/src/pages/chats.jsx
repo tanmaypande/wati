@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { listContacts } from "../services/contactsApi";
 import { assignAgent, closeConversation, createConversation, getConversation, listAgents, listConversations } from "../services/conversationsApi";
-import "../styles/Chats.css";
+import "../styles/chats.css";
 
 function Chats() {
   const [conversations, setConversations] = useState([]);
