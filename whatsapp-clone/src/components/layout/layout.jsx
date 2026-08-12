@@ -1,5 +1,5 @@
-import TopBar from "./topbar";
-import Sidebar from "./sidebar";
+import TopBar from "./TopBar";
+import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import "../../styles/layout.css";
 
