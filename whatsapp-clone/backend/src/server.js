@@ -1,69 +1,12 @@
 require('dotenv').config();
-const express = require('express');
 const http = require('http');
-const helmet = require('helmet');
-const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-const dashboardRoutes = require('./routes/dashboard');
-const authRoutes = require('./routes/auth');
-const contactsRoutes = require('./routes/contacts');
-const conversationsRoutes = require('./routes/conversations');
-const templatesRoutes = require('./routes/templates');
-const broadcastsRoutes = require('./routes/broadcasts');
+const app = require('./app');
 const { attachSocket } = require('./socket/socketHandler');
 const prisma = require('./config/prismaClient');
 
-const app = express();
 const server = http.createServer(app);
 
-// Middlewares
-app.use(helmet());
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: true }));
-
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
-if (process.env.NODE_ENV === 'production' && !FRONTEND_ORIGIN) {
-  console.error('FRONTEND_ORIGIN must be set in production. Exiting.');
-  process.exit(1);
-}
-app.use(cors({ origin: FRONTEND_ORIGIN || '*' }));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
-
-// API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/contacts', contactsRoutes);
-app.use('/api/conversations', conversationsRoutes);
-app.use('/api/templates', templatesRoutes);
-app.use('/api/broadcasts', broadcastsRoutes);
-
-// Basic health check
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
-
-// Lightweight DB health/wake-up endpoint. This performs a minimal query
-// through Prisma so that Neon receives a real DB request and can wake if suspended.
-app.get('/api/health/db', async (req, res) => {
-  try {
-    // Execute a minimal raw query. `$queryRaw` is lightweight and sufficient to
-    // verify connectivity without loading any application data.
-    await prisma.$queryRaw`SELECT 1`;
-    return res.json({ success: true, database: 'connected' });
-  } catch (err) {
-    // Do not expose internal error details or credentials. Return a safe status.
-    return res.status(503).json({ success: false, database: 'unavailable' });
-  }
-});
-
-// Global error handler with mapping support
-app.use((err, req, res, next) => {
-  // If handler receives an error with a status, use it; otherwise 500
-  console.error(err);
-  const status = err && err.status ? err.status : 500;
-  const message = status === 500 && process.env.NODE_ENV === 'production' ? 'Internal server error' : (err.message || 'Error');
-  res.status(status).json({ message });
-});
-
-// Attach Socket.IO
+// Attach Socket.IO for local or custom-hosted server.
 attachSocket(server);
 
 // Graceful shutdown helpers
