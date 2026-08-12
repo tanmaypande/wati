@@ -1,7 +1,7 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
-import "../../styles/TopBar.css";
+import "../../styles/topbar.css";
 import {
   FaBell,
   FaCog,

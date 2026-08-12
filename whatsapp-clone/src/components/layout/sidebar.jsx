@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { FiBarChart2, FiGrid, FiMessageSquare, FiSend, FiSettings, FiUsers, FiFileText } from "react-icons/fi";
-import "../../styles/Sidebar.css";
+import "../../styles/sidebar.css";
 
 const menuItems = [
   { to: "/dashboard", label: "Dashboard", icon: <FiGrid /> },
