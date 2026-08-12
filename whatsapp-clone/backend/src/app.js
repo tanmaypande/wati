@@ -42,6 +42,21 @@ app.get('/api/health/db', async (req, res) => {
   }
 });
 
+// WhatsApp webhook verification
+app.get('/webhook', (req, res) => {
+    const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
+
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+        return res.status(200).send(challenge);
+    }
+
+    return res.sendStatus(403);
+});
+
 app.use((err, req, res, next) => {
   console.error(err);
   const status = err && err.status ? err.status : 500;
