@@ -33,8 +33,8 @@ export default function BroadcastModal({ open = false, onClose }) {
       .finally(() => setLoadingTemplates(false));
 
     setContactsLoading(true);
-    contactsApi.listContacts({ q: '' })
-      .then((data) => setContacts(Array.isArray(data) ? data : []))
+    contactsApi.listContacts({ limit: 500 })
+      .then((data) => setContacts(Array.isArray(data) ? data : (data?.items || [])))
       .catch((err) => console.error('Failed to load contacts', err))
       .finally(() => setContactsLoading(false));
   }, [open]);

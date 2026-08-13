@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { FiSearch, FiCheck, FiUsers } from 'react-icons/fi';
 import './RecipientSelector.css';
 
@@ -9,8 +10,19 @@ export default function RecipientSelector({
   onToggleContact,
   onSelectAll,
 }) {
+  const filteredContacts = useMemo(() => {
+    if (!search || !search.trim()) return contacts;
+    const q = search.toLowerCase().trim();
+    return contacts.filter(
+      (c) =>
+        (c.name || '').toLowerCase().includes(q) ||
+        (c.phone || '').toLowerCase().includes(q) ||
+        (c.email || '').toLowerCase().includes(q)
+    );
+  }, [contacts, search]);
+
   const selectedContacts = contacts.filter((contact) => selectedIds.includes(contact.id));
-  const allSelected = contacts.length > 0 && selectedContacts.length === contacts.length;
+  const allSelected = filteredContacts.length > 0 && filteredContacts.every((c) => selectedIds.includes(c.id));
 
   return (
     <section className="recipient-selector">
@@ -49,10 +61,12 @@ export default function RecipientSelector({
       </div>
 
       <div className="recipient-selector__list">
-        {contacts.length === 0 ? (
-          <div className="recipient-selector__empty">No contacts to show.</div>
+        {filteredContacts.length === 0 ? (
+          <div className="recipient-selector__empty">
+            {contacts.length === 0 ? 'No contacts found in your workspace.' : 'No contacts match your search.'}
+          </div>
         ) : (
-          contacts.map((contact) => {
+          filteredContacts.map((contact) => {
             const selected = selectedIds.includes(contact.id);
             return (
               <button
