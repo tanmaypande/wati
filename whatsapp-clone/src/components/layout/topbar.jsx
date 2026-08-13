@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
+import { useTheme } from "../../context/ThemeContext";
 import "../../styles/topbar.css";
 import {
   FaBell,
   FaCog,
   FaQuestionCircle,
   FaUserCircle,
+  FaSun,
+  FaMoon,
 } from "react-icons/fa";
 
 function TopBar({ onToggleSidebar }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [activePopover, setActivePopover] = useState(null);
   const popoverRoot = useRef(null);
 
@@ -140,6 +144,18 @@ function TopBar({ onToggleSidebar }) {
               </div>
             </div>
           )}
+        </div>
+
+        <div className="topbar-icon-wrapper">
+          <button
+            type="button"
+            className="topbar-icon theme-toggle"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? <FaSun style={{ color: '#f59e0b' }} /> : <FaMoon style={{ color: '#475569' }} />}
+          </button>
         </div>
 
         <div className="topbar-icon-wrapper">
