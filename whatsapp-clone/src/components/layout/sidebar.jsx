@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { FiBarChart2, FiGrid, FiMessageSquare, FiSend, FiSettings, FiUsers, FiFileText, FiShield } from "react-icons/fi";
 import { useAuth } from "../../context/useAuth";
+import watiLogo from "../../assets/wati-logo.png";
 import "../../styles/sidebar.css";
 
 function Sidebar({ open, onClose }) {
@@ -20,6 +21,7 @@ function Sidebar({ open, onClose }) {
   return (
     <aside className={`sidebar ${open ? 'open' : ''}`} onClick={() => { if (onClose) onClose(); }}>
       <div className="sidebar-logo">
+        <img src={watiLogo} alt="WATI Logo" className="sidebar-logo-icon" />
         <h2>
           WATI<span>Clone</span>
         </h2>

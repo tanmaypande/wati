@@ -9,6 +9,8 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 
+import watiLogo from "../../assets/wati-logo.png";
+
 function TopBar({ onToggleSidebar }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -69,8 +71,11 @@ function TopBar({ onToggleSidebar }) {
         <button className="hamburger" aria-label="Toggle menu" onClick={() => onToggleSidebar && onToggleSidebar()}>
           ☰
         </button>
-        <h2>Dashboard</h2>
-        <p>Welcome back, {displayName} 👋</p>
+        <img src={watiLogo} alt="WATI Logo" className="topbar-brand-logo" />
+        <div>
+          <h2>Dashboard</h2>
+          <p>Welcome back, {displayName} 👋</p>
+        </div>
       </div>
 
       <div className="topbar-right">

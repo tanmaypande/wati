@@ -13,6 +13,7 @@ import {
   FiStar,
 } from 'react-icons/fi';
 import { useAuth } from '../context/useAuth';
+import watiLogo from '../assets/wati-logo.png';
 import '../styles/Landing.css';
 
 const featureCards = [
@@ -71,8 +72,9 @@ export default function Landing() {
   return (
     <div className="landing-page">
       <header className={`landing-navbar ${menuOpen ? 'open' : ''}`}>
-        <div className="landing-navbar-brand">
-          <span>WATI</span> Clone
+        <div className="landing-navbar-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img src={watiLogo} alt="WATI Logo" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
+          <div><span>WATI</span> Clone</div>
         </div>
 
         <button
@@ -154,6 +156,18 @@ export default function Landing() {
           </div>
 
           <div className="landing-hero-visual">
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <img
+                src={watiLogo}
+                alt="WATI Command Center"
+                style={{
+                  width: '130px',
+                  height: '130px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 15px 30px rgba(37, 211, 102, 0.4))',
+                }}
+              />
+            </div>
             <div className="hero-card hero-card--top">
               <div className="hero-card-tag">Live Overview</div>
               <div className="hero-card-title">Dashboard summary</div>
