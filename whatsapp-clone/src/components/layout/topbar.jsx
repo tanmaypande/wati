@@ -81,10 +81,6 @@ function TopBar({ onToggleSidebar }) {
           + New Chat
         </button>
 
-        <button className="create-btn" type="button" onClick={handleLogout}>
-          Logout
-        </button>
-
         <div className="topbar-icon-wrapper">
           <button
             type="button"

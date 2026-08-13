@@ -1,10 +1,17 @@
-import { NavLink } from "react-router-dom";
-import { FiBarChart2, FiGrid, FiMessageSquare, FiSend, FiSettings, FiUsers, FiFileText, FiShield } from "react-icons/fi";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FiBarChart2, FiGrid, FiMessageSquare, FiSend, FiSettings, FiUsers, FiFileText, FiShield, FiLogOut } from "react-icons/fi";
 import { useAuth } from "../../context/useAuth";
 import "../../styles/sidebar.css";
 
 function Sidebar({ open, onClose }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    if (onClose) onClose();
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   const menuItems = [
     { to: "/dashboard", label: "Dashboard", icon: <FiGrid /> },
@@ -37,6 +44,13 @@ function Sidebar({ open, onClose }) {
             <span>{item.label}</span>
           </NavLink>
         ))}
+      </div>
+
+      <div className="sidebar-bottom">
+        <button type="button" className="sidebar-logout-btn" onClick={handleLogout}>
+          <span className="menu-icon"><FiLogOut /></span>
+          <span>Logout</span>
+        </button>
       </div>
     </aside>
   );
