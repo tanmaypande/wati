@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import "../../styles/topbar.css";
@@ -153,24 +153,43 @@ function TopBar({ onToggleSidebar }) {
         <div className="topbar-icon-wrapper">
           <button
             type="button"
-            className={`topbar-icon profile ${activePopover === "profile" ? "active" : ""}`}
+            className={`topbar-profile-btn ${activePopover === "profile" ? "active" : ""}`}
             onClick={() => togglePopover("profile")}
             aria-label="Profile menu"
           >
-            <FaUserCircle />
+            <div className="topbar-profile-avatar">
+              <span>{(displayName || "U").charAt(0).toUpperCase()}</span>
+            </div>
+            <div className="topbar-profile-details">
+              <span className="topbar-profile-name">{displayName}</span>
+              <span className={`topbar-profile-role ${user?.role === 'ADMIN' ? 'admin' : 'agent'}`}>
+                {user?.role || "USER"}
+              </span>
+            </div>
           </button>
           {activePopover === "profile" && (
             <div className="topbar-popover topbar-popover--right topbar-popover--profile">
               <div className="popover-user">
-                <div className="popover-user-name">{user?.name || "User"}</div>
-                {user?.email && <div className="popover-user-meta">{user.email}</div>}
-                {user?.role && <div className="popover-user-meta">Role: {user.role}</div>}
+                <div className="popover-user-header">
+                  <div className="topbar-profile-avatar large">
+                    <span>{(displayName || "U").charAt(0).toUpperCase()}</span>
+                  </div>
+                  <div>
+                    <div className="popover-user-name">{user?.name || "User"}</div>
+                    {user?.email && <div className="popover-user-meta">{user.email}</div>}
+                    {user?.role && (
+                      <span className={`topbar-profile-role ${user?.role === 'ADMIN' ? 'admin' : 'agent'}`}>
+                        {user.role}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
               <button type="button" className="popover-item" onClick={handleOpenSettings}>
-                Profile / Settings
+                ⚙ Profile & Settings
               </button>
-              <button type="button" className="popover-item" onClick={handleLogout}>
-                Logout
+              <button type="button" className="popover-item logout" onClick={handleLogout}>
+                🚪 Logout
               </button>
             </div>
           )}
