@@ -109,6 +109,39 @@ async function listAgents(req, res) {
   }
 }
 
+async function sendMessage(req, res) {
+  try {
+    const { id } = req.params;
+    const { content, sender } = req.body;
+    const message = await conversationsService.sendMessage({
+      conversationId: id,
+      content,
+      sender,
+      workspaceId: req.user.workspaceId,
+    });
+    return res.status(201).json({ success: true, data: message });
+  } catch (err) {
+    console.error('Send message error', err);
+    const status = mapErrorToStatus(err);
+    return res.status(status).json({ success: false, message: err.message });
+  }
+}
+
+async function suggestAIReply(req, res) {
+  try {
+    const { id } = req.params;
+    const suggestion = await conversationsService.suggestAIReply({
+      conversationId: id,
+      workspaceId: req.user.workspaceId,
+    });
+    return res.json({ success: true, data: { suggestion } });
+  } catch (err) {
+    console.error('AI suggest error', err);
+    const status = mapErrorToStatus(err);
+    return res.status(status).json({ success: false, message: err.message });
+  }
+}
+
 module.exports = {
   listConversations,
   createConversation,
@@ -116,4 +149,6 @@ module.exports = {
   closeConversation,
   assignAgent,
   listAgents,
+  sendMessage,
+  suggestAIReply,
 };

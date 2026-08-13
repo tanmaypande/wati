@@ -177,6 +177,83 @@ async function listAgents({ workspaceId }) {
   });
 }
 
+async function sendMessage({ conversationId, content, sender = 'AGENT', workspaceId }) {
+  if (!conversationId) throw new Error('Conversation ID is required');
+  if (!content || !content.trim()) throw new Error('Message content cannot be empty');
+
+  const conversation = await prisma.conversation.findFirst({
+    where: { id: conversationId, workspaceId },
+    include: { contact: true },
+  });
+
+  if (!conversation) {
+    const e = new Error('Conversation not found');
+    e.status = 404;
+    throw e;
+  }
+
+  // Attempt sending real WhatsApp Cloud API message if configured
+  try {
+    const whatsappService = require('./whatsappService');
+    if (conversation.contact?.phone) {
+      await whatsappService.sendTextMessage(conversation.contact.phone, content.trim()).catch((err) => {
+        console.warn('WhatsApp Cloud API notice:', err.message);
+      });
+    }
+  } catch (err) {
+    console.warn('WhatsApp service notice:', err.message);
+  }
+
+  const message = await prisma.message.create({
+    data: {
+      conversationId,
+      sender: sender === 'CUSTOMER' ? 'CUSTOMER' : 'AGENT',
+      content: content.trim(),
+    },
+  });
+
+  await prisma.conversation.update({
+    where: { id: conversationId },
+    data: { updatedAt: new Date() },
+  });
+
+  return message;
+}
+
+async function suggestAIReply({ conversationId, workspaceId }) {
+  const conversation = await prisma.conversation.findFirst({
+    where: { id: conversationId, workspaceId },
+    include: {
+      contact: true,
+      messages: { orderBy: { createdAt: 'desc' }, take: 5 },
+    },
+  });
+
+  if (!conversation) {
+    const e = new Error('Conversation not found');
+    e.status = 404;
+    throw e;
+  }
+
+  const lastCustomerMsg = conversation.messages?.find((m) => m.sender === 'CUSTOMER')?.content;
+  const name = conversation.contact?.name || 'Customer';
+
+  if (!lastCustomerMsg) {
+    return `Hello ${name}! How can I help you today with your workspace or query?`;
+  }
+
+  const lower = lastCustomerMsg.toLowerCase();
+  if (lower.includes('price') || lower.includes('cost') || lower.includes('rate')) {
+    return `Hi ${name}, thank you for reaching out! Our pricing details and plans are available. Let me know which service you are interested in.`;
+  } else if (lower.includes('order') || lower.includes('status') || lower.includes('track')) {
+    return `Hi ${name}, I am checking your order status right now. Please allow me a moment to provide you with the update.`;
+  } else if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
+    return `Hello ${name}! Welcome to our WhatsApp customer support. How may I assist you today?`;
+  } else {
+    return `Hi ${name}, thanks for your message. I am looking into this right now and will assist you shortly.`;
+  }
+}
+
 module.exports = {
   createConversation,
   listConversations,
@@ -184,4 +261,6 @@ module.exports = {
   closeConversation,
   assignAgent,
   listAgents,
+  sendMessage,
+  suggestAIReply,
 };

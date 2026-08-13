@@ -30,3 +30,13 @@ export async function listAgents() {
   const resp = await api.get('/conversations/agents');
   return resp.data.data;
 }
+
+export async function sendMessage(id, content, sender = 'AGENT') {
+  const resp = await api.post(`/conversations/${id}/messages`, { content, sender });
+  return resp.data.data;
+}
+
+export async function suggestAIReply(id) {
+  const resp = await api.post(`/conversations/${id}/ai-suggest`);
+  return resp.data.data;
+}
