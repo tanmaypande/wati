@@ -1,0 +1,39 @@
+.mobile-warning-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.mobile-warning-card {
+  background: #fff;
+  color: #222;
+  max-width: 420px;
+  width: calc(100% - 32px);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+}
+
+.mobile-warning-card h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.mobile-warning-card p {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #444;
+}
+
+.mobile-warning-actions {
+  text-align: right;
+}
+
+.mobile-warning-actions .btn {
+  padding: 8px 12px;
+  font-size: 14px;
+}

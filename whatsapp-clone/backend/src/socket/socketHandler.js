@@ -41,8 +41,9 @@ function attachSocket(server) {
         // attach claims to socket for future use
         socket.user = claims;
 
-        // Optionally check role if only certain roles should subscribe
-        socket.join('dashboard');
+        // Join a per-user dashboard room to avoid broadcasting other users' updates
+        const room = `dashboard:${claims.userId}`;
+        socket.join(room);
       } catch (err) {
         socket.emit('error', { message: 'Invalid or expired token' });
       }
@@ -58,6 +59,13 @@ function attachSocket(server) {
 
 function emitDashboardUpdate(payload) {
   if (!ioRef) return;
+  // Prefer per-user dashboard rooms. If userId provided, emit only to that user's room.
+  if (payload && payload.userId) {
+    const room = `dashboard:${payload.userId}`;
+    ioRef.to(room).emit('dashboard:update', payload);
+    return;
+  }
+  // Fallback: emit to global dashboard room (rare)
   ioRef.to('dashboard').emit('dashboard:update', payload);
 }
 

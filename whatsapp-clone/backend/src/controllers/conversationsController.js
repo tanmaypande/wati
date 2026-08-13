@@ -12,7 +12,8 @@ function mapErrorToStatus(err) {
 async function listConversations(req, res) {
   try {
     const { q } = req.query;
-    const conversations = await conversationsService.listConversations({ q });
+    const userId = req.user && req.user.id;
+    const conversations = await conversationsService.listConversations({ q, userId });
     return res.json({ success: true, data: conversations });
   } catch (err) {
     console.error('List conversations error', err);
@@ -24,7 +25,8 @@ async function listConversations(req, res) {
 async function createConversation(req, res) {
   try {
     const { contactId, assignedToId, status } = req.body;
-    const conversation = await conversationsService.createConversation({ contactId, assignedToId, status });
+    const userId = req.user && req.user.id;
+    const conversation = await conversationsService.createConversation({ contactId, assignedToId, status, userId });
     return res.status(201).json({ success: true, data: conversation });
   } catch (err) {
     console.error('Create conversation error', err);
@@ -36,7 +38,8 @@ async function createConversation(req, res) {
 async function getConversation(req, res) {
   try {
     const { id } = req.params;
-    const conversation = await conversationsService.getConversation({ id });
+    const userId = req.user && req.user.id;
+    const conversation = await conversationsService.getConversation({ id, userId });
     return res.json({ success: true, data: conversation });
   } catch (err) {
     console.error('Get conversation error', err);
@@ -48,7 +51,8 @@ async function getConversation(req, res) {
 async function closeConversation(req, res) {
   try {
     const { id } = req.params;
-    const conversation = await conversationsService.closeConversation({ id });
+    const userId = req.user && req.user.id;
+    const conversation = await conversationsService.closeConversation({ id, userId });
     return res.json({ success: true, data: conversation });
   } catch (err) {
     console.error('Close conversation error', err);
@@ -61,7 +65,8 @@ async function assignAgent(req, res) {
   try {
     const { id } = req.params;
     const { assignedToId } = req.body;
-    const conversation = await conversationsService.assignAgent({ id, assignedToId });
+    const userId = req.user && req.user.id;
+    const conversation = await conversationsService.assignAgent({ id, assignedToId, userId });
     return res.json({ success: true, data: conversation });
   } catch (err) {
     console.error('Assign agent error', err);

@@ -8,8 +8,16 @@ function mapConversation(conversation) {
   };
 }
 
-async function createConversation({ contactId, assignedToId, status = 'OPEN' }) {
+async function createConversation({ contactId, assignedToId, status = 'OPEN', userId }) {
   if (!contactId) throw new Error('Contact ID is required');
+
+  // Verify contact belongs to user
+  const contact = await prisma.contact.findUnique({ where: { id: contactId }, select: { userId: true } });
+  if (!contact || contact.userId !== userId) {
+    const e = new Error('Contact not found');
+    e.status = 404;
+    throw e;
+  }
 
   const conversation = await prisma.conversation.create({
     data: {
@@ -30,15 +38,23 @@ async function createConversation({ contactId, assignedToId, status = 'OPEN' }) 
   return mapConversation(conversation);
 }
 
-async function listConversations({ q } = {}) {
+async function listConversations({ q, userId } = {}) {
+  // Only return conversations for contacts owned by the user
+  const baseWhere = { contact: { userId } };
+
   const where = q
     ? {
-        OR: [
-          { contact: { name: { contains: q, mode: 'insensitive' } } },
-          { contact: { phone: { contains: q, mode: 'insensitive' } } },
+        AND: [
+          baseWhere,
+          {
+            OR: [
+              { contact: { name: { contains: q, mode: 'insensitive' } } },
+              { contact: { phone: { contains: q, mode: 'insensitive' } } },
+            ],
+          },
         ],
       }
-    : {};
+    : baseWhere;
 
   const conversations = await prisma.conversation.findMany({
     where,
@@ -56,9 +72,10 @@ async function listConversations({ q } = {}) {
   return conversations.map(mapConversation);
 }
 
-async function getConversation({ id }) {
-  const conversation = await prisma.conversation.findUnique({
-    where: { id },
+async function getConversation({ id, userId }) {
+  // Ensure conversation belongs to a contact owned by the user
+  const conversation = await prisma.conversation.findFirst({
+    where: { id, contact: { userId } },
     include: {
       contact: true,
       assignedTo: true,
@@ -77,7 +94,15 @@ async function getConversation({ id }) {
   return mapConversation(conversation);
 }
 
-async function closeConversation({ id }) {
+async function closeConversation({ id, userId }) {
+  // Only allow closing if conversation belongs to user's contact
+  const existing = await prisma.conversation.findFirst({ where: { id, contact: { userId } } });
+  if (!existing) {
+    const e = new Error('Conversation not found');
+    e.status = 404;
+    throw e;
+  }
+
   const conversation = await prisma.conversation.update({
     where: { id },
     data: { status: 'CLOSED' },
@@ -94,7 +119,15 @@ async function closeConversation({ id }) {
   return mapConversation(conversation);
 }
 
-async function assignAgent({ id, assignedToId }) {
+async function assignAgent({ id, assignedToId, userId }) {
+  // Only allow assignment if conversation belongs to user's contact
+  const existing = await prisma.conversation.findFirst({ where: { id, contact: { userId } } });
+  if (!existing) {
+    const e = new Error('Conversation not found');
+    e.status = 404;
+    throw e;
+  }
+
   const conversation = await prisma.conversation.update({
     where: { id },
     data: { assignedToId: assignedToId || null },

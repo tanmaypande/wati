@@ -2,12 +2,14 @@ import { useState } from "react";
 import TopBar from "./topbar";
 import Sidebar from "./sidebar";
 import Footer from "./Footer";
+import MobileWarning from '../MobileWarning';
 import "../../styles/layout.css";
 
 function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="layout">
+      <MobileWarning />
       {/* Top Navigation */}
       <TopBar onToggleSidebar={() => setSidebarOpen((s) => !s)} />
 
