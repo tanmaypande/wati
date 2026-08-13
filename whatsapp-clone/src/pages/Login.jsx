@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowRight, FaComments, FaEnvelope, FaLock, FaShieldAlt } from 'react-icons/fa';
 import { useAuth } from '../context/useAuth';
-import watiLogo from '../assets/wati-logo.png';
 import '../styles/Login.css';
 
 export default function Login() {
@@ -19,7 +18,7 @@ export default function Login() {
       <div className="login-page">
         <div className="login-shell">
           <div className="login-card" style={{ width: '100%', maxWidth: 450, padding: 32, textAlign: 'center' }}>
-            <img src={watiLogo} alt="WATI Logo" style={{ width: 64, height: 64, objectFit: 'contain', margin: '0 auto 16px' }} />
+            <div className="login-card-icon" style={{ margin: '0 auto 16px' }}>W</div>
             <h2>Already Signed In</h2>
             <p style={{ margin: '12px 0 24px', color: '#6b7280', fontSize: '0.95rem' }}>
               You are currently signed in as <strong>{user.email || user.name || 'User'}</strong> ({user.role || 'User'}).
@@ -81,7 +80,7 @@ export default function Login() {
 
         <div className="login-card">
           <div className="login-card-header">
-            <img src={watiLogo} alt="WATI Logo" style={{ width: 44, height: 44, objectFit: 'contain', marginRight: 12 }} />
+            <img src="/logo.png" alt="WATI Logo" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
             <div>
               <h2>Sign in</h2>
               <p>Access your dashboard and chat workspace</p>

@@ -13,7 +13,6 @@ import {
   FiStar,
 } from 'react-icons/fi';
 import { useAuth } from '../context/useAuth';
-import watiLogo from '../assets/wati-logo.png';
 import '../styles/Landing.css';
 
 const featureCards = [
@@ -72,9 +71,9 @@ export default function Landing() {
   return (
     <div className="landing-page">
       <header className={`landing-navbar ${menuOpen ? 'open' : ''}`}>
-        <div className="landing-navbar-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src={watiLogo} alt="WATI Logo" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
-          <div><span>WATI</span> Clone</div>
+        <div className="landing-navbar-brand">
+          <img src="/logo.png" alt="WATI Logo" style={{ height: '38px', width: 'auto', marginRight: '10px', verticalAlign: 'middle' }} />
+          <span>WATI</span> Clone
         </div>
 
         <button
@@ -158,13 +157,14 @@ export default function Landing() {
           <div className="landing-hero-visual">
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
               <img
-                src={watiLogo}
-                alt="WATI Command Center"
+                src="/logo.png"
+                alt="WATI Hero Logo"
                 style={{
-                  width: '130px',
-                  height: '130px',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 15px 30px rgba(37, 211, 102, 0.4))',
+                  maxWidth: '220px',
+                  width: '100%',
+                  height: 'auto',
+                  filter: 'drop-shadow(0 20px 30px rgba(37, 211, 102, 0.3))',
+                  animation: 'float 4s ease-in-out infinite',
                 }}
               />
             </div>
@@ -348,8 +348,9 @@ export default function Landing() {
       <footer className="landing-footer">
         <div className="landing-footer-grid">
           <div className="landing-footer-brand">
-            <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <h2>WATI <span>Clone</span></h2>
+            <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+              <img src="/logo.png" alt="WATI Logo" style={{ height: '36px', width: 'auto', marginRight: '10px' }} />
+              <h2 style={{ margin: 0 }}>WATI <span>Clone</span></h2>
             </Link>
             <p>Centralized WhatsApp communication for modern teams.</p>
           </div>

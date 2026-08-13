@@ -6,8 +6,9 @@ function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-logo">
-          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <h2>
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
+            <img src="/logo.png" alt="WATI Logo" style={{ height: '32px', width: 'auto', marginRight: '10px' }} />
+            <h2 style={{ margin: 0 }}>
               WATI <span>Clone</span>
             </h2>
           </Link>
