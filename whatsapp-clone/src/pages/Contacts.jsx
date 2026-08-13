@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createContact, deleteContact, listContacts, updateContact } from '../services/contactsApi';
+import ImportContactsModal from '../components/contacts/ImportContactsModal';
 import '../styles/Contacts.css';
 
 const emptyForm = {
@@ -19,6 +20,7 @@ function Contacts() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const loadContacts = async (query = '') => {
     setLoading(true);
@@ -109,16 +111,43 @@ function Contacts() {
           <h1>Contacts</h1>
           <p>Manage your WhatsApp contacts from one place.</p>
         </div>
-        <button className="btn btn-primary" type="button" onClick={() => {
-          setShowForm((current) => !current);
-          setEditingId(null);
-          setForm(emptyForm);
-          setError('');
-          setSuccess('');
-        }}>
-          {showForm ? 'Cancel' : '+ Add contact'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={() => {
+              setShowImportModal(true);
+              setError('');
+              setSuccess('');
+            }}
+          >
+            Import Contacts
+          </button>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => {
+              setShowForm((current) => !current);
+              setEditingId(null);
+              setForm(emptyForm);
+              setError('');
+              setSuccess('');
+            }}
+          >
+            {showForm ? 'Cancel' : '+ Add contact'}
+          </button>
+        </div>
       </div>
+
+      {showImportModal ? (
+        <ImportContactsModal
+          onClose={() => setShowImportModal(false)}
+          onImportSuccess={() => {
+            setSuccess('Contacts imported successfully');
+            void loadContacts('');
+          }}
+        />
+      ) : null}
 
       {error ? <div className="alert alert-danger">{error}</div> : null}
       {success ? <div className="alert alert-success">{success}</div> : null}

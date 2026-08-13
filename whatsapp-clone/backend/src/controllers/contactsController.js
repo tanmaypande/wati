@@ -151,10 +151,78 @@ async function searchContacts(req, res) {
     }
 }
 
+const contactImportService = require('../services/contactImportService');
+
+async function previewImport(req, res) {
+    try {
+        if (!req.file || !req.file.buffer) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please upload a CSV or XLSX file.'
+            });
+        }
+
+        const previewData = await contactImportService.previewImport({
+            buffer: req.file.buffer,
+            originalname: req.file.originalname,
+            mimetype: req.file.mimetype,
+            workspaceId: req.user.workspaceId,
+        });
+
+        return res.json({
+            success: true,
+            data: previewData
+        });
+    } catch (err) {
+        console.error('Preview import error', err);
+        const status = mapErrorToStatus(err);
+        return res.status(status).json({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
+async function executeImport(req, res) {
+    try {
+        const { contacts } = req.body;
+
+        const importResult = await contactImportService.executeImport({
+            contacts,
+            workspaceId: req.user.workspaceId,
+        });
+
+        try {
+            emitDashboardUpdate({
+                type: 'contacts_imported',
+                userId: req.user.id,
+                workspaceId: req.user.workspaceId,
+                importedCount: importResult.imported
+            });
+        } catch (emitErr) {
+            console.warn('Failed to emit dashboard update', emitErr);
+        }
+
+        return res.status(201).json({
+            success: true,
+            data: importResult
+        });
+    } catch (err) {
+        console.error('Execute import error', err);
+        const status = mapErrorToStatus(err);
+        return res.status(status).json({
+            success: false,
+            message: err.message
+        });
+    }
+}
+
 module.exports = {
     createContact,
     updateContact,
     deleteContact,
     getContact,
-    searchContacts
+    searchContacts,
+    previewImport,
+    executeImport
 };

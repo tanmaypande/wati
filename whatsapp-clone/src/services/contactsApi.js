@@ -24,3 +24,19 @@ export async function deleteContact(id) {
   const resp = await api.delete(`/contacts/${id}`);
   return resp.data;
 }
+
+export async function previewImportContacts(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const resp = await api.post('/contacts/import/preview', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return resp.data.data;
+}
+
+export async function executeImportContacts(contacts) {
+  const resp = await api.post('/contacts/import', { contacts });
+  return resp.data.data;
+}
