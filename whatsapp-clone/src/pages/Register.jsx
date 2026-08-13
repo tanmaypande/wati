@@ -8,6 +8,7 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,11 +22,25 @@ export default function Register() {
     return re.test(s);
   };
 
+  const passwordMeets = (pw) => {
+    if (!pw || typeof pw !== 'string') return false;
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8}$/;
+    return re.test(pw);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     if (!validateEmail(email)) {
       setError('Please enter a valid email address.');
+      return;
+    }
+    if (password !== passwordConfirm) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (!passwordMeets(password)) {
+      setError('Password does not meet requirements.');
       return;
     }
     setLoading(true);
@@ -87,7 +102,16 @@ export default function Register() {
               <span>Password</span>
               <div className="input-icon-group">
                 <FaLock />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter a password" required />
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter a password" maxLength={8} required />
+              </div>
+              <small className="password-hint">Password must be exactly 8 characters and include upper, lower, number and special character.</small>
+            </label>
+
+            <label className="login-field">
+              <span>Confirm Password</span>
+              <div className="input-icon-group">
+                <FaLock />
+                <input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} placeholder="Confirm password" maxLength={8} required />
               </div>
             </label>
 

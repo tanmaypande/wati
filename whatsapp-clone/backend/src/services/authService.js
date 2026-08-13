@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { signAccessToken, signRefreshToken } = require('../utils/jwt');
-const { isValidEmail } = require('../utils/validation');
+const { isValidEmail, isValidPassword } = require('../utils/validation');
 
 const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10);
 
@@ -116,22 +116,25 @@ async function register({ name, email, password, role = 'AGENT' }) {
     err.status = 400;
     throw err;
   }
-
-  // check duplicate in Users
+n  // password validation: enforce exactly 8 chars and required classes
+  if (!isValidPassword(password)) {
+    const err = new Error('Password does not meet requirements');
+    err.status = 400;
+    throw err;
+  }
+n  // check duplicate in Users
   const existing = await prisma.user.findUnique({ where: { email: normalized } });
   if (existing) {
     const err = new Error('Email already registered');
     err.status = 409;
     throw err;
   }
-
-  // generate OTP and hash it
+n  // generate OTP and hash it
   const otp = generateOtp();
   const otpHash = await bcrypt.hash(otp, SALT_ROUNDS);
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-  const verificationRecord = await prisma.emailVerification.create({ data: { email: normalized, otpHash, name, passwordHash, expiresAt, lastSentAt: new Date() } });
+n  const verificationRecord = await prisma.emailVerification.create({ data: { email: normalized, otpHash, name, passwordHash, expiresAt, lastSentAt: new Date() } });
 
   try {
     await sendVerificationEmail(normalized, otp);
@@ -316,6 +319,11 @@ async function resetPassword({ token, newPassword }) {
   const record = await prisma.passwordReset.findUnique({ where: { token } });
   if (!record || record.used) throw new Error('Invalid or used token');
   if (record.expiresAt < new Date()) throw new Error('Token expired');
+  if (!isValidPassword(newPassword)) {
+    const err = new Error('Password does not meet requirements');
+    err.status = 400;
+    throw err;
+  }
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await prisma.user.update({ where: { id: record.userId }, data: { password: hashed } });
   await prisma.passwordReset.update({ where: { id: record.id }, data: { used: true } });
@@ -337,6 +345,11 @@ async function getProfile({ userId }) {
 async function changePassword({ userId, currentPassword, newPassword }) {
   if (!userId) throw new Error('Missing user id');
   if (!currentPassword || !newPassword) throw new Error('Current password and new password are required');
+  if (!isValidPassword(newPassword)) {
+    const err = new Error('Password does not meet requirements');
+    err.status = 400;
+    throw err;
+  }
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
     const err = new Error('User not found');

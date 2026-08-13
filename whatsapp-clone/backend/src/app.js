@@ -8,6 +8,7 @@ const contactsRoutes = require('./routes/contacts');
 const conversationsRoutes = require('./routes/conversations');
 const templatesRoutes = require('./routes/templates');
 const broadcastsRoutes = require('./routes/broadcasts');
+const whatsappRoutes = require('./routes/whatsapp');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/api/contacts', contactsRoutes);
 app.use('/api/conversations', conversationsRoutes);
 app.use('/api/templates', templatesRoutes);
 app.use('/api/broadcasts', broadcastsRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 

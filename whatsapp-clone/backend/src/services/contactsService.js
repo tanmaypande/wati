@@ -1,10 +1,10 @@
 const prisma = require('../config/prismaClient');
 const { Prisma } = require('@prisma/client');
 
-async function createContact({ name, phone, email, profileImage }) {
+async function createContact({ userId, name, phone, email, profileImage }) {
   try {
     const contact = await prisma.contact.create({
-      data: { name, phone, email: email || null, profileImage: profileImage || null },
+      data: { userId, name, phone, email: email || null, profileImage: profileImage || null },
     });
     return contact;
   } catch (err) {
@@ -16,8 +16,16 @@ async function createContact({ name, phone, email, profileImage }) {
   }
 }
 
-async function updateContact({ id, name, phone, email, profileImage }) {
+async function updateContact({ id, userId, name, phone, email, profileImage }) {
   try {
+    // Ensure contact belongs to user before updating
+    const existing = await prisma.contact.findUnique({ where: { id }, select: { userId: true } });
+    if (!existing || existing.userId !== userId) {
+      const e = new Error('Contact not found');
+      e.status = 404;
+      throw e;
+    }
+
     const updated = await prisma.contact.update({
       where: { id },
       data: { name, phone, email: email || null, profileImage: profileImage || null },
@@ -37,8 +45,16 @@ async function updateContact({ id, name, phone, email, profileImage }) {
   }
 }
 
-async function deleteContact({ id }) {
+async function deleteContact({ id, userId }) {
   try {
+    // Only allow deletion if contact belongs to user
+    const existing = await prisma.contact.findUnique({ where: { id }, select: { userId: true } });
+    if (!existing || existing.userId !== userId) {
+      const e = new Error('Contact not found');
+      e.status = 404;
+      throw e;
+    }
+
     await prisma.contact.delete({ where: { id } });
     return true;
   } catch (err) {
@@ -51,9 +67,9 @@ async function deleteContact({ id }) {
   }
 }
 
-async function getContact({ id }) {
-  const contact = await prisma.contact.findUnique({
-    where: { id },
+async function getContact({ id, userId }) {
+  const contact = await prisma.contact.findFirst({
+    where: { id, userId },
     include: {
       conversations: {
         select: { id: true, status: true, assignedToId: true, updatedAt: true },
@@ -72,16 +88,22 @@ async function getContact({ id }) {
   return contact;
 }
 
-async function searchContacts({ q, page = 1, limit = 20 }) {
+async function searchContacts({ userId, q, page = 1, limit = 20 }) {
+  const baseWhere = { userId };
   const where = q
     ? {
-        OR: [
-          { name: { contains: q, mode: 'insensitive' } },
-          { phone: { contains: q, mode: 'insensitive' } },
-          { email: { contains: q, mode: 'insensitive' } },
+        AND: [
+          baseWhere,
+          {
+            OR: [
+              { name: { contains: q, mode: 'insensitive' } },
+              { phone: { contains: q, mode: 'insensitive' } },
+              { email: { contains: q, mode: 'insensitive' } },
+            ],
+          },
         ],
       }
-    : {};
+    : baseWhere;
 
   const take = Math.min(Number(limit) || 20, 200);
   const skip = (Math.max(Number(page) || 1, 1) - 1) * take;

@@ -13,4 +13,9 @@
     flex:1;
     background:#f5f7fb;
     padding:30px;
+    min-width:0; /* allow children to shrink and avoid overflow */
+}
+
+@media (max-width: 768px) {
+  .content{ padding:16px; }
 }

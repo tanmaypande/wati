@@ -27,9 +27,13 @@ model Contact {
   phone         String         @unique
   email         String?
   profileImage  String?
+  userId        String?         // Nullable initially to allow safe migration of existing records
+  user          User?           @relation(fields: [userId], references: [id])
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   conversations Conversation[]
+
+  @@index([userId])
 }
 
 model Conversation {

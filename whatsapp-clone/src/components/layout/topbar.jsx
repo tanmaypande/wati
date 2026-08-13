@@ -9,7 +9,7 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 
-function TopBar() {
+function TopBar({ onToggleSidebar }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [activePopover, setActivePopover] = useState(null);
@@ -66,6 +66,9 @@ function TopBar() {
   return (
     <header className="topbar" ref={popoverRoot}>
       <div className="topbar-left">
+        <button className="hamburger" aria-label="Toggle menu" onClick={() => onToggleSidebar && onToggleSidebar()}>
+          ☰
+        </button>
         <h2>Dashboard</h2>
         <p>Welcome back, {displayName} 👋</p>
       </div>

@@ -1,27 +1,29 @@
+import { useState } from "react";
 import TopBar from "./topbar";
 import Sidebar from "./sidebar";
 import Footer from "./Footer";
 import "../../styles/layout.css";
 
 function Layout({ children }) {
-return (
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  return (
     <div className="layout">
       {/* Top Navigation */}
-    <TopBar />
+      <TopBar onToggleSidebar={() => setSidebarOpen((s) => !s)} />
 
       {/* Sidebar + Main Content */}
-    <div className="main">
-        <Sidebar />
+      <div className="main">
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <main className="content">
-        {children}
+        <main className="content" onClick={() => { if (sidebarOpen) setSidebarOpen(false); }}>
+          {children}
         </main>
-    </div>
+      </div>
 
-    {/* Footer */}
-    <Footer />
+      {/* Footer */}
+      <Footer />
     </div>
-);
+  );
 }
 
 export default Layout;

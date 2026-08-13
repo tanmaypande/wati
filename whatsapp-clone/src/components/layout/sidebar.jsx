@@ -12,9 +12,9 @@ const menuItems = [
   { to: "/settings", label: "Settings", icon: <FiSettings /> },
 ];
 
-function Sidebar() {
+function Sidebar({ open, onClose }) {
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${open ? 'open' : ''}`} onClick={() => { if (onClose) onClose(); }}>
       <div className="sidebar-logo">
         <h2>
           WATI<span>Clone</span>

@@ -8,6 +8,20 @@
     padding:0 30px;
     border-bottom:1px solid #e5e7eb;
 }
+.hamburger{
+  display:none;
+  background:transparent;
+  border:none;
+  font-size:22px;
+  margin-right:10px;
+}
+
+@media (max-width: 768px) {
+  .hamburger{ display:inline-block; }
+  .topbar-left h2{ font-size:18px; }
+  .topbar-left p{ display:none; }
+  .create-btn{ padding:8px 10px; font-size:13px; }
+}
 
 .topbar-left h2{
     font-size:24px;
