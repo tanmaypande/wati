@@ -7,7 +7,10 @@ export default function BroadcastFilters({
   onSearch,
   onStatusChange,
   onCreate,
+  onNewBroadcast,
 }) {
+  const handleCreate = onCreate || onNewBroadcast;
+
   return (
     <div className="broadcast-filters">
       <div className="broadcast-filters__search">
@@ -40,7 +43,7 @@ export default function BroadcastFilters({
         </select>
       </div>
 
-      <button type="button" className="broadcast-filters__create" onClick={() => onCreate && onCreate()}>
+      <button type="button" className="broadcast-filters__create" onClick={() => handleCreate && handleCreate()}>
         <FiPlus />
         Create broadcast
       </button>

@@ -1,13 +1,11 @@
 import './BroadcastDetails.css';
 
 export default function BroadcastDetails({ broadcast = {}, recipients = [], onClose }) {
-  const {
-    name = 'Broadcast details',
-    message = 'No message preview available.',
-    status = 'Draft',
-    createdAt = '',
-    sentAt = '',
-  } = broadcast;
+  const name = broadcast.title || broadcast.name || 'Broadcast details';
+  const message = broadcast.message || 'No message preview available.';
+  const status = broadcast.status || 'Sent';
+  const createdAt = broadcast.createdAt || '';
+  const sentAt = broadcast.sentAt || broadcast.createdAt || '';
 
   const sentTime = sentAt
     ? new Date(sentAt).toLocaleString(undefined, {

@@ -6,23 +6,21 @@ export default function BroadcastCard({
   onOpenDetails,
   onAction,
 }) {
-  const {
-    name = 'Untitled broadcast',
-    message = 'No message available yet.',
-    recipientsCount = 0,
-    sent = 0,
-    failed = 0,
-    pending = 0,
-    status = 'Draft',
-    createdAt = '',
-  } = broadcast;
+  const name = broadcast.title || broadcast.name || 'Untitled broadcast';
+  const message = broadcast.message || 'No message available yet.';
+  const recipientsCount = broadcast.recipientCount ?? broadcast.recipientsCount ?? (broadcast.recipientIds?.length || 0);
+  const sent = broadcast.sent ?? (broadcast.status === 'Draft' ? 0 : recipientsCount);
+  const failed = broadcast.failed ?? 0;
+  const pending = broadcast.pending ?? 0;
+  const status = broadcast.status || 'Sent';
+  const createdAt = broadcast.createdAt || '';
 
   const statusClass = {
     Sent: 'broadcast-card__status--sent',
     Scheduled: 'broadcast-card__status--scheduled',
     Failed: 'broadcast-card__status--failed',
     Draft: 'broadcast-card__status--draft',
-  }[status] || 'broadcast-card__status--draft';
+  }[status] || 'broadcast-card__status--sent';
 
   const createdLabel = createdAt
     ? new Date(createdAt).toLocaleDateString(undefined, {
