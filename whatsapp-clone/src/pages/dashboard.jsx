@@ -1,4 +1,5 @@
-﻿import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+import { FiUser } from "react-icons/fi";
 import "../styles/dashboard.css";
 import { fetchOverview, fetchRecent, fetchMessagesChart } from "../services/dashboardApi";
 import { getAccessToken } from "../services/tokenService";
@@ -118,7 +119,10 @@ function Dashboard() {
 
           {recent.map((c) => (
             <div className="chat-item" key={c.id}>
-              <span>ðŸ‘¤ {c.contact?.name || c.contact?.phone || 'Unknown'}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <FiUser style={{ color: '#25D366', fontSize: '1.05rem' }} />
+                {c.contact?.name || c.contact?.phone || 'Unknown'}
+              </span>
               <small>{new Date(c.updatedAt).toLocaleString()}</small>
             </div>
           ))}
