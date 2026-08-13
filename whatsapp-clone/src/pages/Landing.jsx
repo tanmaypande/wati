@@ -12,6 +12,7 @@ import {
   FiShield,
   FiStar,
 } from 'react-icons/fi';
+import { useAuth } from '../context/useAuth';
 import '../styles/Landing.css';
 
 const featureCards = [
@@ -64,6 +65,7 @@ const steps = [
 
 export default function Landing() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -83,19 +85,39 @@ export default function Landing() {
         </button>
 
         <nav className="landing-navbar-links">
-          <Link to="/login" className="landing-navbar-link" onClick={() => setMenuOpen(false)}>
-            Log In
-          </Link>
-          <button
-            type="button"
-            className="landing-navbar-cta"
-            onClick={() => {
-              setMenuOpen(false);
-              navigate('/register');
-            }}
-          >
-            Sign Up
-          </button>
+          {user ? (
+            <>
+              <Link to="/dashboard" className="landing-navbar-link" onClick={() => setMenuOpen(false)}>
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                className="landing-navbar-cta"
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate('/dashboard');
+                }}
+              >
+                Go to Dashboard
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="landing-navbar-link" onClick={() => setMenuOpen(false)}>
+                Log In
+              </Link>
+              <button
+                type="button"
+                className="landing-navbar-cta"
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate('/register');
+                }}
+              >
+                Sign Up
+              </button>
+            </>
+          )}
         </nav>
       </header>
 
@@ -110,12 +132,20 @@ export default function Landing() {
             </p>
 
             <div className="landing-hero-actions">
-              <button type="button" className="landing-hero-button landing-hero-button--primary" onClick={() => navigate('/register')}>
-                Get Started Free <FiArrowRight />
-              </button>
-              <button type="button" className="landing-hero-button landing-hero-button--secondary" onClick={() => navigate('/login')}>
-                Log In
-              </button>
+              {user ? (
+                <button type="button" className="landing-hero-button landing-hero-button--primary" onClick={() => navigate('/dashboard')}>
+                  Go to Dashboard <FiArrowRight />
+                </button>
+              ) : (
+                <>
+                  <button type="button" className="landing-hero-button landing-hero-button--primary" onClick={() => navigate('/register')}>
+                    Get Started Free <FiArrowRight />
+                  </button>
+                  <button type="button" className="landing-hero-button landing-hero-button--secondary" onClick={() => navigate('/login')}>
+                    Log In
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="landing-hero-trust">

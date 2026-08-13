@@ -10,14 +10,43 @@ export default function Login() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { login, user, loading: authLoading } = useAuth();
+  const { login, logout, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [authLoading, navigate, user]);
+  if (!authLoading && user) {
+    return (
+      <div className="login-page">
+        <div className="login-shell">
+          <div className="login-card" style={{ width: '100%', maxWidth: 450, padding: 32, textAlign: 'center' }}>
+            <div className="login-card-icon" style={{ margin: '0 auto 16px' }}>W</div>
+            <h2>Already Signed In</h2>
+            <p style={{ margin: '12px 0 24px', color: '#6b7280', fontSize: '0.95rem' }}>
+              You are currently signed in as <strong>{user.email || user.name || 'User'}</strong> ({user.role || 'User'}).
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <button
+                type="button"
+                className="login-btn"
+                onClick={() => navigate('/dashboard', { replace: true })}
+              >
+                Go to Dashboard <FaArrowRight />
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                style={{ width: '100%', padding: '10px 16px', borderRadius: 8, cursor: 'pointer', fontWeight: 500 }}
+                onClick={async () => {
+                  await logout();
+                }}
+              >
+                Sign Out & Switch Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
