@@ -19,32 +19,32 @@ const featureCards = [
   {
     icon: <FiMessageSquare />, 
     title: 'WhatsApp Conversations',
-    description: 'Manage customer conversations from one centralized interface.',
+    description: 'Multi-agent inbox with real-time customer messaging and agent assignment.',
   },
   {
     icon: <FiUsers />,
-    title: 'Contact Management',
-    description: 'Organize customer contacts and keep your communication list ready.',
+    title: 'Contact Management & Import',
+    description: 'Organize workspace contacts and bulk import via CSV & Excel (.xlsx) files.',
   },
   {
     icon: <FiFileText />,
     title: 'Message Templates',
-    description: 'Create and reuse message templates for fast, consistent replies.',
+    description: 'Create and submit WhatsApp approved message templates with variable parameters.',
   },
   {
     icon: <FiSend />,
-    title: 'Broadcasts',
-    description: 'Send campaigns to multiple contacts with a single workflow.',
+    title: 'Broadcast Campaigns',
+    description: 'Launch mass WhatsApp broadcasts to contacts with recipient tracking.',
   },
   {
     icon: <FiBarChart2 />,
-    title: 'Analytics',
-    description: 'Track communications and see what matters in one dashboard.',
+    title: 'Analytics & Insights',
+    description: 'Track conversation response rates, active chats, and daily message volumes.',
   },
   {
     icon: <FiShield />,
-    title: 'Secure Workspace',
-    description: 'Protected access with login, verification and account control.',
+    title: 'Workspace Isolation',
+    description: 'Multi-tenant database security with strict workspace isolation and role access.',
   },
 ];
 
@@ -126,16 +126,17 @@ export default function Landing() {
         <section className="landing-hero">
           <div className="landing-hero-copy">
             <span className="landing-eyebrow">Customer conversation management for modern teams</span>
-            <div className="landing-hero-title-group" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
+            <div className="landing-hero-title-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.25rem' }}>
               <img
                 src="/logo.png"
                 alt="WATI Hero Logo"
                 style={{
-                  width: '84px',
-                  height: '84px',
+                  width: '72px',
+                  height: '72px',
                   objectFit: 'contain',
                   flexShrink: 0,
-                  filter: 'drop-shadow(0 12px 25px rgba(37, 211, 102, 0.35))',
+                  marginTop: '4px',
+                  filter: 'drop-shadow(0 10px 20px rgba(37, 211, 102, 0.35))',
                 }}
               />
               <h1 style={{ margin: 0 }}>Build better customer conversations with WATI Clone.</h1>
