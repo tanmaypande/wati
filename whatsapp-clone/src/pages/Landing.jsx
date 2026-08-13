@@ -334,12 +334,15 @@ export default function Landing() {
       <footer className="landing-footer">
         <div className="landing-footer-grid">
           <div className="landing-footer-brand">
-            <h2>WATI <span>Clone</span></h2>
+            <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <h2>WATI <span>Clone</span></h2>
+            </Link>
             <p>Centralized WhatsApp communication for modern teams.</p>
           </div>
 
           <div>
             <h4>Product</h4>
+            <Link to="/" className="footer-link">Home</Link>
             <Link to="/dashboard" className="footer-link">Dashboard</Link>
             <Link to="/chats" className="footer-link">Chats</Link>
             <Link to="/contacts" className="footer-link">Contacts</Link>
