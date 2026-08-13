@@ -722,6 +722,18 @@
     padding: 1.75rem 1rem 3rem;
   }
 
+  .landing-hero-title-group {
+    flex-direction: row;
+  }
+
+  @media (max-width: 600px) {
+    .landing-hero-title-group {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+  }
+
   .landing-hero-copy h1 {
     font-size: 2.5rem;
   }

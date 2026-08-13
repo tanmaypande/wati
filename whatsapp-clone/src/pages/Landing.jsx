@@ -126,7 +126,20 @@ export default function Landing() {
         <section className="landing-hero">
           <div className="landing-hero-copy">
             <span className="landing-eyebrow">Customer conversation management for modern teams</span>
-            <h1>Build better customer conversations with WATI Clone.</h1>
+            <div className="landing-hero-title-group" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              <img
+                src="/logo.png"
+                alt="WATI Hero Logo"
+                style={{
+                  width: '84px',
+                  height: '84px',
+                  objectFit: 'contain',
+                  flexShrink: 0,
+                  filter: 'drop-shadow(0 12px 25px rgba(37, 211, 102, 0.35))',
+                }}
+              />
+              <h1 style={{ margin: 0 }}>Build better customer conversations with WATI Clone.</h1>
+            </div>
             <p>
               Manage WhatsApp chats, contacts, templates, broadcasts, and analytics from one clean workspace.
               Keep every customer interaction organized and moving forward.
@@ -155,19 +168,7 @@ export default function Landing() {
           </div>
 
           <div className="landing-hero-visual">
-            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <img
-                src="/logo.png"
-                alt="WATI Hero Logo"
-                style={{
-                  maxWidth: '220px',
-                  width: '100%',
-                  height: 'auto',
-                  filter: 'drop-shadow(0 20px 30px rgba(37, 211, 102, 0.3))',
-                  animation: 'float 4s ease-in-out infinite',
-                }}
-              />
-            </div>
+            
             <div className="hero-card hero-card--top">
               <div className="hero-card-tag">Live Overview</div>
               <div className="hero-card-title">Dashboard summary</div>
