@@ -261,10 +261,24 @@ async function login({ email, password }) {
   const user = await prisma.user.findUnique({ where: { email }, include: { workspace: true } });
   if (!user) throw new Error('Invalid credentials');
 
+  if (user.isActive === false) {
+    const err = new Error('Your account has been deactivated.');
+    err.status = 403;
+    throw err;
+  }
+
+  if (user.role !== 'SUPER_ADMIN' && user.workspace && user.workspace.status === 'SUSPENDED') {
+    const err = new Error('Workspace is suspended. Access denied. Please contact platform administrator.');
+    err.status = 403;
+    err.code = 'WORKSPACE_SUSPENDED';
+    throw err;
+  }
+
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error('Invalid credentials');
 
-  const payload = { userId: user.id, role: user.role, workspaceId: user.workspaceId };
+  const workspaceId = user.role === 'SUPER_ADMIN' ? null : user.workspaceId;
+  const payload = { userId: user.id, role: user.role, workspaceId };
 
   const accessToken = signAccessToken(payload);
   const refreshToken = signRefreshToken(payload);
@@ -274,7 +288,18 @@ async function login({ email, password }) {
   // Record active login session
   await prisma.session.create({ data: { userId: user.id } });
 
-  return { user: { id: user.id, name: user.name, email: user.email, role: user.role, workspaceId: user.workspaceId, workspaceName: user.workspace?.name }, accessToken, refreshToken };
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      workspaceId,
+      workspaceName: user.role === 'SUPER_ADMIN' ? 'Platform Operator' : user.workspace?.name,
+    },
+    accessToken,
+    refreshToken,
+  };
 }
 
 async function refresh({ token }) {

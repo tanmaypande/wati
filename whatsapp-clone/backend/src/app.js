@@ -10,6 +10,8 @@ const templatesRoutes = require('./routes/templates');
 const broadcastsRoutes = require('./routes/broadcasts');
 const whatsappRoutes = require('./routes/whatsapp');
 const agentsRoutes = require('./routes/agents');
+const superAdminRoutes = require('./routes/superAdmin');
+const ensureSuperAdmin = require('./utils/seedSuperAdmin');
 
 const app = express();
 
@@ -25,6 +27,7 @@ if (process.env.NODE_ENV === 'production' && !FRONTEND_ORIGIN) {
 app.use(cors({ origin: FRONTEND_ORIGIN || '*' }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 
+// Mount Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/contacts', contactsRoutes);
@@ -33,6 +36,7 @@ app.use('/api/templates', templatesRoutes);
 app.use('/api/broadcasts', broadcastsRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/agents', agentsRoutes);
+app.use('/api/super-admin', superAdminRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
@@ -60,6 +64,9 @@ app.get('/webhook', (req, res) => {
 
     return res.sendStatus(403);
 });
+
+// Auto seed default super admin user on startup
+ensureSuperAdmin();
 
 app.use((err, req, res, next) => {
   console.error(err);
