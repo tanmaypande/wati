@@ -6,6 +6,7 @@ import ProfileSettings from '../components/SettingsProfile';
 import SecuritySettings from '../components/SettingsSecurity';
 import WorkspaceSettings from '../components/SettingsWorkspace';
 import NotificationSettings from '../components/SettingsNotifications';
+import SettingsWhatsApp from '../components/SettingsWhatsApp';
 import '../styles/Settings.css';
 
 export default function Settings() {
@@ -34,6 +35,7 @@ export default function Settings() {
           {section === 'profile' && <ProfileSettings />}
           {section === 'security' && <SecuritySettings />}
           {section === 'workspace' && <WorkspaceSettings />}
+          {section === 'whatsapp' && <SettingsWhatsApp />}
           {section === 'notifications' && <NotificationSettings />}
 
           <div className="settings-logout">

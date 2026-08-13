@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiUser, FiLock, FiGlobe, FiBell } from 'react-icons/fi';
+import { FiUser, FiLock, FiGlobe, FiBell, FiMessageSquare } from 'react-icons/fi';
 import '../styles/Settings.css';
 
 export default function SettingsSidebar({ section, onSelect }) {
@@ -7,6 +7,7 @@ export default function SettingsSidebar({ section, onSelect }) {
     { id: 'profile', label: 'Profile', icon: <FiUser /> },
     { id: 'security', label: 'Security', icon: <FiLock /> },
     { id: 'workspace', label: 'Workspace', icon: <FiGlobe /> },
+    { id: 'whatsapp', label: 'WhatsApp API Test', icon: <FiMessageSquare /> },
     { id: 'notifications', label: 'Notifications', icon: <FiBell /> },
   ];
 
