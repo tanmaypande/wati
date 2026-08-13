@@ -6,17 +6,13 @@ const { Prisma } = require('@prisma/client');
  * Returns totalContacts, totalConversations, activeConversations, closedConversations,
  * broadcastCount, templatesCount
  */
-async function getOverview(userId) {
-  // Scope counts to the authenticated user where appropriate.
-  // Contacts are user-owned.
-  const totalContactsPromise = prisma.contact.count({ where: { userId } });
-  // Conversations are tied to contacts; only count conversations for contacts owned by user
-  const totalConversationsPromise = prisma.conversation.count({ where: { contact: { userId } } });
-  const activeConversationsPromise = prisma.conversation.count({ where: { status: 'OPEN', contact: { userId } } });
-  const closedConversationsPromise = prisma.conversation.count({ where: { status: 'CLOSED', contact: { userId } } });
-  // Broadcasts and templates are global — keep as-is
-  const broadcastCountPromise = prisma.broadcast.count();
-  const templatesCountPromise = prisma.template.count();
+async function getOverview(workspaceId) {
+  const totalContactsPromise = prisma.contact.count({ where: { workspaceId } });
+  const totalConversationsPromise = prisma.conversation.count({ where: { workspaceId } });
+  const activeConversationsPromise = prisma.conversation.count({ where: { status: 'OPEN', workspaceId } });
+  const closedConversationsPromise = prisma.conversation.count({ where: { status: 'CLOSED', workspaceId } });
+  const broadcastCountPromise = prisma.broadcast.count({ where: { workspaceId } });
+  const templatesCountPromise = prisma.template.count({ where: { workspaceId } });
 
   const [totalContacts, totalConversations, activeConversations, closedConversations, broadcastCount, templatesCount] = await Promise.all([
     totalContactsPromise,
@@ -40,13 +36,11 @@ async function getOverview(userId) {
 /**
  * Recent chats: return last N active conversations with latest message and contact summary
  */
-async function getRecentChats(userId, limit = 10) {
-  // Ensure limit is reasonable
+async function getRecentChats(workspaceId, limit = 10) {
   const take = Math.max(1, Math.min(limit, 100));
 
-  // Only include conversations whose contact belongs to the user
   const conversations = await prisma.conversation.findMany({
-    where: { contact: { userId } },
+    where: { workspaceId },
     orderBy: { updatedAt: 'desc' },
     take,
     include: {
@@ -75,19 +69,15 @@ async function getRecentChats(userId, limit = 10) {
 /**
  * Aggregate messages per day for the last N days - used for charts
  */
-async function getMessagesPerDay(userId, days = 7) {
+async function getMessagesPerDay(workspaceId, days = 7) {
   const since = new Date();
   since.setDate(since.getDate() - (days - 1));
 
-  // Count only messages that belong to conversations whose contact belongs to user
-  // Join Message -> Conversation -> Contact and filter by contact.userId
-  // Use a raw query with JOIN to ensure proper filtering across tables
   const result = await prisma.$queryRaw(Prisma.sql`
     SELECT DATE(m."createdAt") as day, m."sender" as sender, COUNT(*) as count
     FROM "Message" m
     JOIN "Conversation" c ON c."id" = m."conversationId"
-    JOIN "Contact" ct ON ct."id" = c."contactId"
-    WHERE m."createdAt" >= ${since} AND ct."userId" = ${userId}
+    WHERE m."createdAt" >= ${since} AND c."workspaceId" = ${workspaceId}
     GROUP BY day, m."sender"
     ORDER BY day ASC
   `);

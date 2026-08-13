@@ -116,25 +116,25 @@ async function register({ name, email, password, role = 'AGENT' }) {
     err.status = 400;
     throw err;
   }
-n  // password validation: enforce exactly 8 chars and required classes
+  // password validation: enforce exactly 8 chars and required classes
   if (!isValidPassword(password)) {
     const err = new Error('Password does not meet requirements');
     err.status = 400;
     throw err;
   }
-n  // check duplicate in Users
+  // check duplicate in Users
   const existing = await prisma.user.findUnique({ where: { email: normalized } });
   if (existing) {
     const err = new Error('Email already registered');
     err.status = 409;
     throw err;
   }
-n  // generate OTP and hash it
+  // generate OTP and hash it
   const otp = generateOtp();
   const otpHash = await bcrypt.hash(otp, SALT_ROUNDS);
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-n  const verificationRecord = await prisma.emailVerification.create({ data: { email: normalized, otpHash, name, passwordHash, expiresAt, lastSentAt: new Date() } });
+  const verificationRecord = await prisma.emailVerification.create({ data: { email: normalized, otpHash, name, passwordHash, expiresAt, lastSentAt: new Date() } });
 
   try {
     await sendVerificationEmail(normalized, otp);
@@ -180,23 +180,30 @@ async function verifyEmail({ email, otp }) {
     throw new Error('Invalid verification code.');
   }
 
-  // create user (double-check duplicate)
-  const already = await prisma.user.findUnique({ where: { email: normalized } });
-  if (already) {
-    await prisma.emailVerification.update({ where: { id: record.id }, data: { used: true } });
-    const e = new Error('Email already registered');
-    e.status = 409;
-    throw e;
-  }
+  // create workspace and admin user
+  const workspace = await prisma.workspace.create({
+    data: {
+      name: `${record.name.trim()}'s Workspace`,
+      slug: `${record.name.trim().toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString(36)}`,
+    },
+  });
 
-  const user = await prisma.user.create({ data: { name: record.name, email: normalized, password: record.passwordHash, role: 'AGENT' } });
+  const user = await prisma.user.create({
+    data: {
+      name: record.name,
+      email: normalized,
+      password: record.passwordHash,
+      role: 'ADMIN',
+      workspaceId: workspace.id,
+    },
+  });
 
   await prisma.emailVerification.update({ where: { id: record.id }, data: { used: true } });
 
   // create initial session record (no tokens returned)
   await prisma.session.create({ data: { userId: user.id } });
 
-  return { message: 'Email verified and account created' };
+  return { message: 'Email verified and workspace account created' };
 }
 
 // Resend verification code with cooldown
@@ -249,20 +256,25 @@ async function resendVerification({ email }) {
   return { message: 'Verification code resent' };
 }
 
-// Existing login/refresh/logout/forgot/reset/getProfile/changePassword implementations (unchanged logic)
+// Login with Workspace token payload and Session logging
 async function login({ email, password }) {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email }, include: { workspace: true } });
   if (!user) throw new Error('Invalid credentials');
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error('Invalid credentials');
 
-  const accessToken = signAccessToken({ userId: user.id, role: user.role });
-  const refreshToken = signRefreshToken({ userId: user.id });
+  const payload = { userId: user.id, role: user.role, workspaceId: user.workspaceId };
+
+  const accessToken = signAccessToken(payload);
+  const refreshToken = signRefreshToken(payload);
 
   await prisma.refreshToken.create({ data: { token: refreshToken, userId: user.id, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) } });
 
-  return { user: { id: user.id, name: user.name, email: user.email, role: user.role }, accessToken, refreshToken };
+  // Record active login session
+  await prisma.session.create({ data: { userId: user.id } });
+
+  return { user: { id: user.id, name: user.name, email: user.email, role: user.role, workspaceId: user.workspaceId, workspaceName: user.workspace?.name }, accessToken, refreshToken };
 }
 
 async function refresh({ token }) {
@@ -285,8 +297,8 @@ async function refresh({ token }) {
     throw err;
   }
 
-  const user = await prisma.user.findUnique({ where: { id: record.userId }, select: { role: true } });
-  const payload = { userId: record.userId, role: user?.role };
+  const user = await prisma.user.findUnique({ where: { id: record.userId }, select: { role: true, workspaceId: true } });
+  const payload = { userId: record.userId, role: user?.role, workspaceId: user?.workspaceId };
 
   const accessToken = signAccessToken(payload);
   const newRefreshToken = signRefreshToken(payload);
@@ -333,7 +345,10 @@ async function resetPassword({ token, newPassword }) {
 
 async function getProfile({ userId }) {
   if (!userId) throw new Error('Missing user id');
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, name: true, email: true, role: true, createdAt: true, updatedAt: true } });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, name: true, email: true, role: true, workspaceId: true, workspace: { select: { id: true, name: true } }, createdAt: true, updatedAt: true },
+  });
   if (!user) {
     const err = new Error('User not found');
     err.status = 404;

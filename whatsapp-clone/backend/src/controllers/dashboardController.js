@@ -2,8 +2,8 @@ const dashboardService = require('../services/dashboardService');
 
 async function overview(req, res) {
   try {
-    const userId = req.user && req.user.id;
-    const data = await dashboardService.getOverview(userId);
+    const workspaceId = req.user && req.user.workspaceId;
+    const data = await dashboardService.getOverview(workspaceId);
     return res.json({ success: true, data });
   } catch (err) {
     console.error('Dashboard overview error', err);
@@ -13,9 +13,9 @@ async function overview(req, res) {
 
 async function recentChats(req, res) {
   try {
-    const userId = req.user && req.user.id;
+    const workspaceId = req.user && req.user.workspaceId;
     const limit = parseInt(req.query.limit, 10) || 10;
-    const data = await dashboardService.getRecentChats(userId, limit);
+    const data = await dashboardService.getRecentChats(workspaceId, limit);
     return res.json({ success: true, data });
   } catch (err) {
     console.error('Recent chats error', err);
@@ -25,9 +25,9 @@ async function recentChats(req, res) {
 
 async function messagesChart(req, res) {
   try {
-    const userId = req.user && req.user.id;
+    const workspaceId = req.user && req.user.workspaceId;
     const days = parseInt(req.query.days, 10) || 7;
-    const data = await dashboardService.getMessagesPerDay(userId, days);
+    const data = await dashboardService.getMessagesPerDay(workspaceId, days);
     return res.json({ success: true, data });
   } catch (err) {
     console.error('Messages chart error', err);

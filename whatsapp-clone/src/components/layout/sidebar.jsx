@@ -1,18 +1,22 @@
 import { NavLink } from "react-router-dom";
-import { FiBarChart2, FiGrid, FiMessageSquare, FiSend, FiSettings, FiUsers, FiFileText } from "react-icons/fi";
+import { FiBarChart2, FiGrid, FiMessageSquare, FiSend, FiSettings, FiUsers, FiFileText, FiShield } from "react-icons/fi";
+import { useAuth } from "../../context/useAuth";
 import "../../styles/sidebar.css";
 
-const menuItems = [
-  { to: "/dashboard", label: "Dashboard", icon: <FiGrid /> },
-  { to: "/chats", label: "Chats", icon: <FiMessageSquare /> },
-  { to: "/contacts", label: "Contacts", icon: <FiUsers /> },
-  { to: "/broadcast", label: "Broadcast", icon: <FiSend /> },
-  { to: "/templates", label: "Templates", icon: <FiFileText /> },
-  { to: "/analytics", label: "Analytics", icon: <FiBarChart2 /> },
-  { to: "/settings", label: "Settings", icon: <FiSettings /> },
-];
-
 function Sidebar({ open, onClose }) {
+  const { user } = useAuth();
+
+  const menuItems = [
+    { to: "/dashboard", label: "Dashboard", icon: <FiGrid /> },
+    { to: "/chats", label: "Chats", icon: <FiMessageSquare /> },
+    { to: "/contacts", label: "Contacts", icon: <FiUsers /> },
+    ...(user?.role === 'ADMIN' ? [{ to: "/agents", label: "Team Agents", icon: <FiShield /> }] : []),
+    { to: "/broadcast", label: "Broadcast", icon: <FiSend /> },
+    { to: "/templates", label: "Templates", icon: <FiFileText /> },
+    { to: "/analytics", label: "Analytics", icon: <FiBarChart2 /> },
+    { to: "/settings", label: "Settings", icon: <FiSettings /> },
+  ];
+
   return (
     <aside className={`sidebar ${open ? 'open' : ''}`} onClick={() => { if (onClose) onClose(); }}>
       <div className="sidebar-logo">

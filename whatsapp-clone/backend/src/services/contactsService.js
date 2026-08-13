@@ -1,26 +1,24 @@
 const prisma = require('../config/prismaClient');
 const { Prisma } = require('@prisma/client');
 
-async function createContact({ userId, name, phone, email, profileImage }) {
+async function createContact({ workspaceId, name, phone, email, profileImage }) {
   try {
     const contact = await prisma.contact.create({
-      data: { userId, name, phone, email: email || null, profileImage: profileImage || null },
+      data: { workspaceId, name, phone, email: email || null, profileImage: profileImage || null },
     });
     return contact;
   } catch (err) {
-    // Map unique constraint errors to friendly messages
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-      throw new Error('Phone already registered');
+      throw new Error('Phone already registered in this workspace');
     }
     throw err;
   }
 }
 
-async function updateContact({ id, userId, name, phone, email, profileImage }) {
+async function updateContact({ id, workspaceId, name, phone, email, profileImage }) {
   try {
-    // Ensure contact belongs to user before updating
-    const existing = await prisma.contact.findUnique({ where: { id }, select: { userId: true } });
-    if (!existing || existing.userId !== userId) {
+    const existing = await prisma.contact.findUnique({ where: { id }, select: { workspaceId: true } });
+    if (!existing || existing.workspaceId !== workspaceId) {
       const e = new Error('Contact not found');
       e.status = 404;
       throw e;
@@ -33,9 +31,8 @@ async function updateContact({ id, userId, name, phone, email, profileImage }) {
     return updated;
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-      throw new Error('Phone already registered');
+      throw new Error('Phone already registered in this workspace');
     }
-    // If contact not found, Prisma throws P2025
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
       const e = new Error('Contact not found');
       e.status = 404;
@@ -45,11 +42,10 @@ async function updateContact({ id, userId, name, phone, email, profileImage }) {
   }
 }
 
-async function deleteContact({ id, userId }) {
+async function deleteContact({ id, workspaceId }) {
   try {
-    // Only allow deletion if contact belongs to user
-    const existing = await prisma.contact.findUnique({ where: { id }, select: { userId: true } });
-    if (!existing || existing.userId !== userId) {
+    const existing = await prisma.contact.findUnique({ where: { id }, select: { workspaceId: true } });
+    if (!existing || existing.workspaceId !== workspaceId) {
       const e = new Error('Contact not found');
       e.status = 404;
       throw e;
@@ -67,9 +63,9 @@ async function deleteContact({ id, userId }) {
   }
 }
 
-async function getContact({ id, userId }) {
+async function getContact({ id, workspaceId }) {
   const contact = await prisma.contact.findFirst({
-    where: { id, userId },
+    where: { id, workspaceId },
     include: {
       conversations: {
         select: { id: true, status: true, assignedToId: true, updatedAt: true },
@@ -88,8 +84,8 @@ async function getContact({ id, userId }) {
   return contact;
 }
 
-async function searchContacts({ userId, q, page = 1, limit = 20 }) {
-  const baseWhere = { userId };
+async function searchContacts({ workspaceId, q, page = 1, limit = 20 }) {
+  const baseWhere = { workspaceId };
   const where = q
     ? {
         AND: [

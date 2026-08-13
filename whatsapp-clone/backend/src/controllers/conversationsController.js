@@ -12,8 +12,12 @@ function mapErrorToStatus(err) {
 async function listConversations(req, res) {
   try {
     const { q } = req.query;
-    const userId = req.user && req.user.id;
-    const conversations = await conversationsService.listConversations({ q, userId });
+    const conversations = await conversationsService.listConversations({
+      q,
+      workspaceId: req.user.workspaceId,
+      userId: req.user.id,
+      role: req.user.role,
+    });
     return res.json({ success: true, data: conversations });
   } catch (err) {
     console.error('List conversations error', err);
@@ -25,8 +29,14 @@ async function listConversations(req, res) {
 async function createConversation(req, res) {
   try {
     const { contactId, assignedToId, status } = req.body;
-    const userId = req.user && req.user.id;
-    const conversation = await conversationsService.createConversation({ contactId, assignedToId, status, userId });
+    const conversation = await conversationsService.createConversation({
+      contactId,
+      assignedToId,
+      status,
+      workspaceId: req.user.workspaceId,
+      userId: req.user.id,
+      role: req.user.role,
+    });
     return res.status(201).json({ success: true, data: conversation });
   } catch (err) {
     console.error('Create conversation error', err);
@@ -38,8 +48,12 @@ async function createConversation(req, res) {
 async function getConversation(req, res) {
   try {
     const { id } = req.params;
-    const userId = req.user && req.user.id;
-    const conversation = await conversationsService.getConversation({ id, userId });
+    const conversation = await conversationsService.getConversation({
+      id,
+      workspaceId: req.user.workspaceId,
+      userId: req.user.id,
+      role: req.user.role,
+    });
     return res.json({ success: true, data: conversation });
   } catch (err) {
     console.error('Get conversation error', err);
@@ -51,8 +65,12 @@ async function getConversation(req, res) {
 async function closeConversation(req, res) {
   try {
     const { id } = req.params;
-    const userId = req.user && req.user.id;
-    const conversation = await conversationsService.closeConversation({ id, userId });
+    const conversation = await conversationsService.closeConversation({
+      id,
+      workspaceId: req.user.workspaceId,
+      userId: req.user.id,
+      role: req.user.role,
+    });
     return res.json({ success: true, data: conversation });
   } catch (err) {
     console.error('Close conversation error', err);
@@ -65,8 +83,13 @@ async function assignAgent(req, res) {
   try {
     const { id } = req.params;
     const { assignedToId } = req.body;
-    const userId = req.user && req.user.id;
-    const conversation = await conversationsService.assignAgent({ id, assignedToId, userId });
+    const conversation = await conversationsService.assignAgent({
+      id,
+      assignedToId,
+      workspaceId: req.user.workspaceId,
+      userId: req.user.id,
+      role: req.user.role,
+    });
     return res.json({ success: true, data: conversation });
   } catch (err) {
     console.error('Assign agent error', err);
@@ -77,7 +100,7 @@ async function assignAgent(req, res) {
 
 async function listAgents(req, res) {
   try {
-    const agents = await conversationsService.listAgents();
+    const agents = await conversationsService.listAgents({ workspaceId: req.user.workspaceId });
     return res.json({ success: true, data: agents });
   } catch (err) {
     console.error('List agents error', err);

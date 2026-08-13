@@ -18,7 +18,7 @@ async function createContact(req, res) {
         const { name, phone, email, profileImage } = req.body;
 
         const contact = await contactsService.createContact({
-            userId: req.user.id,
+            workspaceId: req.user.workspaceId,
             name,
             phone,
             email,
@@ -29,7 +29,8 @@ async function createContact(req, res) {
             emitDashboardUpdate({
                 type: 'contact_created',
                 contactId: contact.id,
-                userId: req.user.id
+                userId: req.user.id,
+                workspaceId: req.user.workspaceId
             });
         } catch (emitErr) {
             console.warn('Failed to emit dashboard update', emitErr);
@@ -57,7 +58,7 @@ async function updateContact(req, res) {
 
         const updated = await contactsService.updateContact({
             id,
-            userId: req.user.id,
+            workspaceId: req.user.workspaceId,
             name,
             phone,
             email,
@@ -85,7 +86,7 @@ async function deleteContact(req, res) {
 
         await contactsService.deleteContact({
             id,
-            userId: req.user.id
+            workspaceId: req.user.workspaceId
         });
 
         return res.json({ success: true });
@@ -106,7 +107,7 @@ async function getContact(req, res) {
 
         const contact = await contactsService.getContact({
             id,
-            userId: req.user.id
+            workspaceId: req.user.workspaceId
         });
 
         return res.json({
@@ -129,7 +130,7 @@ async function searchContacts(req, res) {
         const { q, page, limit } = req.query;
 
         const result = await contactsService.searchContacts({
-            userId: req.user.id,
+            workspaceId: req.user.workspaceId,
             q,
             page,
             limit

@@ -10,7 +10,7 @@ function mapErrorToStatus(err) {
 
 async function listTemplates(req, res) {
   try {
-    const templates = await templateService.listTemplates();
+    const templates = await templateService.listTemplates({ workspaceId: req.user.workspaceId });
     return res.json({ success: true, data: templates });
   } catch (err) {
     console.error('List templates error', err);
@@ -22,7 +22,7 @@ async function listTemplates(req, res) {
 async function getTemplate(req, res) {
   try {
     const { id } = req.params;
-    const template = await templateService.getTemplate({ id });
+    const template = await templateService.getTemplate({ id, workspaceId: req.user.workspaceId });
     return res.json({ success: true, data: template });
   } catch (err) {
     console.error('Get template error', err);
@@ -34,7 +34,7 @@ async function getTemplate(req, res) {
 async function createTemplate(req, res) {
   try {
     const { name, category, body, status, language } = req.body;
-    const template = await templateService.createTemplate({ name, category, body, status, language });
+    const template = await templateService.createTemplate({ workspaceId: req.user.workspaceId, name, category, body, status, language });
     return res.status(201).json({ success: true, data: template });
   } catch (err) {
     console.error('Create template error', err);
@@ -47,7 +47,7 @@ async function updateTemplate(req, res) {
   try {
     const { id } = req.params;
     const { name, category, body, status, language } = req.body;
-    const template = await templateService.updateTemplate({ id, name, category, body, status, language });
+    const template = await templateService.updateTemplate({ id, workspaceId: req.user.workspaceId, name, category, body, status, language });
     return res.json({ success: true, data: template });
   } catch (err) {
     console.error('Update template error', err);
@@ -59,7 +59,7 @@ async function updateTemplate(req, res) {
 async function deleteTemplate(req, res) {
   try {
     const { id } = req.params;
-    await templateService.deleteTemplate({ id });
+    await templateService.deleteTemplate({ id, workspaceId: req.user.workspaceId });
     return res.json({ success: true });
   } catch (err) {
     console.error('Delete template error', err);

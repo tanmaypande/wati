@@ -12,6 +12,7 @@ import Broadcast from "../pages/Broadcast";
 import Template from "../pages/Template";
 import Analytics from "../pages/Analytics";
 import Settings from "../pages/Settings";
+import Agents from "../pages/Agents";
 
 function AppRoutes() {
   return (
@@ -24,6 +25,7 @@ function AppRoutes() {
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/chats" element={<PrivateRoute><Chats /></PrivateRoute>} />
       <Route path="/contacts" element={<PrivateRoute><Contacts /></PrivateRoute>} />
+      <Route path="/agents" element={<PrivateRoute><Agents /></PrivateRoute>} />
       <Route
         path="/broadcast"
         element={

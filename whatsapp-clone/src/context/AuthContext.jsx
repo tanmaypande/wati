@@ -1,14 +1,28 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AuthContext } from './authContext';
-import { login as apiLogin, register as apiRegister, logout as apiLogout, refresh as apiRefresh } from '../services/authApi';
+import { login as apiLogin, register as apiRegister, logout as apiLogout, refresh as apiRefresh, getProfile } from '../services/authApi';
 import { getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, clearTokens } from '../services/tokenService';
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const token = getAccessToken();
-    return token ? {} : null;
-  });
-  const [loading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function initAuth() {
+      const token = getAccessToken();
+      if (token) {
+        try {
+          const profile = await getProfile();
+          setUser(profile);
+        } catch {
+          clearTokens();
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    }
+    void initAuth();
+  }, []);
 
   const login = useCallback(async (credentials) => {
     const resp = await apiLogin(credentials);
@@ -20,7 +34,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = useCallback(async (payload) => {
-    // Registration now initiates email verification and does not log the user in.
     const resp = await apiRegister(payload);
     return resp;
   }, []);
@@ -40,7 +53,6 @@ export function AuthProvider({ children }) {
     const refreshToken = getRefreshToken();
     if (!refreshToken) throw new Error('No refresh token');
     const data = await apiRefresh(refreshToken);
-    // data: { accessToken, refreshToken }
     setAccessToken(data.accessToken);
     setRefreshToken(data.refreshToken);
     return data.accessToken;

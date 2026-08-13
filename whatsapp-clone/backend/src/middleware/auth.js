@@ -12,10 +12,10 @@ const authenticate = (req, res, next) => {
   try {
     const payload = verifyAccessToken(token);
     // Validate expected claims
-    if (!payload || !payload.userId || !payload.role) {
+    if (!payload || !payload.userId || !payload.role || !payload.workspaceId) {
       return res.status(401).json({ message: 'Invalid token claims' });
     }
-    req.user = { id: payload.userId, role: payload.role };
+    req.user = { id: payload.userId, role: payload.role, workspaceId: payload.workspaceId };
     return next();
   } catch (err) {
     // Keep returned message generic for clients; detailed info should be logged server-side if needed

@@ -9,6 +9,7 @@ const conversationsRoutes = require('./routes/conversations');
 const templatesRoutes = require('./routes/templates');
 const broadcastsRoutes = require('./routes/broadcasts');
 const whatsappRoutes = require('./routes/whatsapp');
+const agentsRoutes = require('./routes/agents');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/conversations', conversationsRoutes);
 app.use('/api/templates', templatesRoutes);
 app.use('/api/broadcasts', broadcastsRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/agents', agentsRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 

@@ -41,9 +41,9 @@ function attachSocket(server) {
         // attach claims to socket for future use
         socket.user = claims;
 
-        // Join a per-user dashboard room to avoid broadcasting other users' updates
-        const room = `dashboard:${claims.userId}`;
-        socket.join(room);
+        // Join per-user and per-workspace rooms
+        if (claims.userId) socket.join(`dashboard:${claims.userId}`);
+        if (claims.workspaceId) socket.join(`workspace:${claims.workspaceId}`);
       } catch (err) {
         socket.emit('error', { message: 'Invalid or expired token' });
       }
@@ -59,13 +59,14 @@ function attachSocket(server) {
 
 function emitDashboardUpdate(payload) {
   if (!ioRef) return;
-  // Prefer per-user dashboard rooms. If userId provided, emit only to that user's room.
-  if (payload && payload.userId) {
-    const room = `dashboard:${payload.userId}`;
-    ioRef.to(room).emit('dashboard:update', payload);
+  if (payload && payload.workspaceId) {
+    ioRef.to(`workspace:${payload.workspaceId}`).emit('dashboard:update', payload);
     return;
   }
-  // Fallback: emit to global dashboard room (rare)
+  if (payload && payload.userId) {
+    ioRef.to(`dashboard:${payload.userId}`).emit('dashboard:update', payload);
+    return;
+  }
   ioRef.to('dashboard').emit('dashboard:update', payload);
 }
 

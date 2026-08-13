@@ -7,46 +7,68 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users         User[]
+  contacts      Contact[]
+  conversations Conversation[]
+  templates     Template[]
+  broadcasts    Broadcast[]
+}
+
 model User {
   id             String          @id @default(cuid())
   name           String
   email          String          @unique
   password       String
-  role           UserRole        @default(AGENT)
+  role           UserRole        @default(ADMIN)
+  workspaceId    String
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id])
   conversations  Conversation[]
   passwordResets PasswordReset[]
   refreshTokens  RefreshToken[]
   sessions       Session[]
+
+  @@index([workspaceId])
 }
 
 model Contact {
   id            String         @id @default(cuid())
   name          String
-  phone         String         @unique
+  phone         String
   email         String?
   profileImage  String?
-  userId        String?         // Nullable initially to allow safe migration of existing records
-  user          User?           @relation(fields: [userId], references: [id])
+  workspaceId   String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id])
   conversations Conversation[]
 
-  @@index([userId])
+  @@unique([workspaceId, phone])
+  @@index([workspaceId])
 }
 
 model Conversation {
   id           String             @id @default(cuid())
   contactId    String
   assignedToId String?
+  workspaceId  String
   status       ConversationStatus @default(OPEN)
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
+  workspace    Workspace          @relation(fields: [workspaceId], references: [id])
   assignedTo   User?              @relation(fields: [assignedToId], references: [id])
   contact      Contact            @relation(fields: [contactId], references: [id])
   messages     Message[]
 
+  @@index([workspaceId])
   @@index([contactId])
   @@index([assignedToId])
 }
@@ -63,21 +85,29 @@ model Message {
 }
 
 model Template {
-  id        String   @id @default(cuid())
-  name      String
-  category  String
-  body      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  language  String   @default("English")
-  status    String   @default("PENDING")
+  id          String    @id @default(cuid())
+  name        String
+  category    String
+  body        String
+  language    String    @default("English")
+  status      String    @default("PENDING")
+  workspaceId String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
 }
 
 model Broadcast {
-  id        String   @id @default(cuid())
-  title     String
-  message   String
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  title       String
+  message     String
+  workspaceId String
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
 }
 
 model Session {

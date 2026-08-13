@@ -8,20 +8,31 @@ function mapConversation(conversation) {
   };
 }
 
-async function createConversation({ contactId, assignedToId, status = 'OPEN', userId }) {
+async function createConversation({ contactId, assignedToId, status = 'OPEN', workspaceId, userId, role }) {
   if (!contactId) throw new Error('Contact ID is required');
 
-  // Verify contact belongs to user
-  const contact = await prisma.contact.findUnique({ where: { id: contactId }, select: { userId: true } });
-  if (!contact || contact.userId !== userId) {
+  // Verify contact belongs to caller's workspace
+  const contact = await prisma.contact.findUnique({ where: { id: contactId }, select: { workspaceId: true } });
+  if (!contact || contact.workspaceId !== workspaceId) {
     const e = new Error('Contact not found');
     e.status = 404;
     throw e;
   }
 
+  // If assignedToId is provided, verify target agent belongs to same workspace
+  if (assignedToId) {
+    const targetAgent = await prisma.user.findUnique({ where: { id: assignedToId }, select: { workspaceId: true } });
+    if (!targetAgent || targetAgent.workspaceId !== workspaceId) {
+      const e = new Error('Target agent does not belong to your workspace');
+      e.status = 403;
+      throw e;
+    }
+  }
+
   const conversation = await prisma.conversation.create({
     data: {
       contactId,
+      workspaceId,
       assignedToId: assignedToId || null,
       status,
     },
@@ -38,14 +49,16 @@ async function createConversation({ contactId, assignedToId, status = 'OPEN', us
   return mapConversation(conversation);
 }
 
-async function listConversations({ q, userId } = {}) {
-  // Only return conversations for contacts owned by the user
-  const baseWhere = { contact: { userId } };
+async function listConversations({ q, workspaceId, userId, role } = {}) {
+  // Scoping: ADMIN sees all workspace conversations; AGENT sees assigned conversations or unassigned in workspace
+  const roleWhere = role === 'ADMIN'
+    ? { workspaceId }
+    : { workspaceId, OR: [{ assignedToId: userId }, { assignedToId: null }] };
 
   const where = q
     ? {
         AND: [
-          baseWhere,
+          roleWhere,
           {
             OR: [
               { contact: { name: { contains: q, mode: 'insensitive' } } },
@@ -54,7 +67,7 @@ async function listConversations({ q, userId } = {}) {
           },
         ],
       }
-    : baseWhere;
+    : roleWhere;
 
   const conversations = await prisma.conversation.findMany({
     where,
@@ -72,10 +85,13 @@ async function listConversations({ q, userId } = {}) {
   return conversations.map(mapConversation);
 }
 
-async function getConversation({ id, userId }) {
-  // Ensure conversation belongs to a contact owned by the user
+async function getConversation({ id, workspaceId, userId, role }) {
+  const roleWhere = role === 'ADMIN'
+    ? { id, workspaceId }
+    : { id, workspaceId, OR: [{ assignedToId: userId }, { assignedToId: null }] };
+
   const conversation = await prisma.conversation.findFirst({
-    where: { id, contact: { userId } },
+    where: roleWhere,
     include: {
       contact: true,
       assignedTo: true,
@@ -94,9 +110,8 @@ async function getConversation({ id, userId }) {
   return mapConversation(conversation);
 }
 
-async function closeConversation({ id, userId }) {
-  // Only allow closing if conversation belongs to user's contact
-  const existing = await prisma.conversation.findFirst({ where: { id, contact: { userId } } });
+async function closeConversation({ id, workspaceId, userId, role }) {
+  const existing = await prisma.conversation.findFirst({ where: { id, workspaceId } });
   if (!existing) {
     const e = new Error('Conversation not found');
     e.status = 404;
@@ -119,13 +134,23 @@ async function closeConversation({ id, userId }) {
   return mapConversation(conversation);
 }
 
-async function assignAgent({ id, assignedToId, userId }) {
-  // Only allow assignment if conversation belongs to user's contact
-  const existing = await prisma.conversation.findFirst({ where: { id, contact: { userId } } });
+async function assignAgent({ id, assignedToId, workspaceId, role }) {
+  // Ensure caller has access to conversation in their workspace
+  const existing = await prisma.conversation.findFirst({ where: { id, workspaceId } });
   if (!existing) {
     const e = new Error('Conversation not found');
     e.status = 404;
     throw e;
+  }
+
+  // PRIORITY 8: Verify assignedToId agent belongs to the SAME workspace!
+  if (assignedToId) {
+    const targetAgent = await prisma.user.findUnique({ where: { id: assignedToId }, select: { workspaceId: true } });
+    if (!targetAgent || targetAgent.workspaceId !== workspaceId) {
+      const e = new Error('Target agent does not belong to your workspace');
+      e.status = 403;
+      throw e;
+    }
   }
 
   const conversation = await prisma.conversation.update({
@@ -144,9 +169,9 @@ async function assignAgent({ id, assignedToId, userId }) {
   return mapConversation(conversation);
 }
 
-async function listAgents() {
+async function listAgents({ workspaceId }) {
   return prisma.user.findMany({
-    where: { role: 'AGENT' },
+    where: { workspaceId, role: 'AGENT' },
     select: { id: true, name: true, email: true, role: true },
     orderBy: { name: 'asc' },
   });
