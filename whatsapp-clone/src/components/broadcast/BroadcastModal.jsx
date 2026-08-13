@@ -5,7 +5,7 @@ import * as templateApi from '../../services/templateApi';
 import * as contactsApi from '../../services/contactsApi';
 import * as broadcastApi from '../../services/broadcastApi';
 
-export default function BroadcastModal({ open = false, onClose }) {
+export default function BroadcastModal({ open = false, onClose, onSuccess }) {
   const [loadingTemplates, setLoadingTemplates] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
@@ -39,7 +39,7 @@ export default function BroadcastModal({ open = false, onClose }) {
       .finally(() => setContactsLoading(false));
   }, [open]);
 
- // derive approved templates first
+  // derive approved templates first
   const approvedTemplates = useMemo(() => templates.filter((t) => (t.status || '').toUpperCase() === 'APPROVED'), [templates]);
   const otherTemplates = useMemo(() => templates.filter((t) => (t.status || '').toUpperCase() !== 'APPROVED'), [templates]);
 
@@ -121,12 +121,13 @@ export default function BroadcastModal({ open = false, onClose }) {
     setError(null);
     setSuccessMessage(null);
 
-    if (!broadcastName) {
+    if (!broadcastName || !broadcastName.trim()) {
       setError('Broadcast name is required.');
       return;
     }
-    if (!selectedTemplate) {
-      setError('Please select a template.');
+    const finalMsg = selectedTemplate ? substitutedMessage() : message;
+    if (!finalMsg || !finalMsg.trim()) {
+      setError('Please select a template or enter a broadcast message.');
       return;
     }
     // ensure variables filled
@@ -142,23 +143,23 @@ export default function BroadcastModal({ open = false, onClose }) {
     }
 
     const payload = {
-      title: broadcastName,
-      message: substitutedMessage(),
-      templateId: selectedTemplate.id,
+      title: broadcastName.trim(),
+      message: finalMsg.trim(),
+      templateId: selectedTemplate?.id || null,
       recipientIds: selectedRecipientIds,
       recipientCount: selectedRecipientIds.length,
-      status: 'DRAFT',
+      status: 'SENT',
     };
 
     try {
       setSaving(true);
       await broadcastApi.createBroadcast(payload);
       setSuccessMessage('Broadcast created successfully.');
-      // reset minimal state and close after short delay
       setTimeout(() => {
         setSaving(false);
+        onSuccess && onSuccess();
         onClose && onClose();
-      }, 800);
+      }, 500);
     } catch (err) {
       console.error('Failed to save broadcast', err);
       setError(err?.response?.data?.message || 'Unable to create broadcast. Please try again.');
@@ -186,19 +187,26 @@ export default function BroadcastModal({ open = false, onClose }) {
           </div>
 
           <div className="broadcast-modal__field">
-            <label htmlFor="select-template">Select Template</label>
-            {templates.length === 0 ? (
-              <div className="broadcast-modal__no-templates">
-                <p>No templates available. Create a template first.</p>
-                <a href="/templates" className="btn btn-link">Create Template</a>
-              </div>
-            ) : (
-              <select id="select-template" value={selectedTemplateId || ''} onChange={(e) => setSelectedTemplateId(e.target.value || null)}>
-                <option value="">-- Select a template --</option>
-                {renderTemplateOptions()}
-              </select>
-            )}
+            <label htmlFor="select-template">Select Template (Optional)</label>
+            <select id="select-template" value={selectedTemplateId || ''} onChange={(e) => setSelectedTemplateId(e.target.value || null)}>
+              <option value="">-- Custom Message (No Template) --</option>
+              {renderTemplateOptions()}
+            </select>
           </div>
+
+          {!selectedTemplate && (
+            <div className="broadcast-modal__field">
+              <label htmlFor="custom-message">Custom Broadcast Message</label>
+              <textarea
+                id="custom-message"
+                className="form-control"
+                rows="3"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Type your broadcast message here..."
+              />
+            </div>
+          )}
 
           {selectedTemplate && (
             <div className="broadcast-modal__field template-preview">
@@ -231,12 +239,12 @@ export default function BroadcastModal({ open = false, onClose }) {
           )}
 
           <div className="broadcast-modal__field">
-            <label>Recipients</label>
+            <label>Recipients ({contacts.length} total contacts available)</label>
             <RecipientSelector
               contacts={contacts}
               selectedIds={selectedRecipientIds}
               search={contactSearch}
-              onSearch={(q) => { setContactSearch(q); /* not performing server-side search here */ }}
+              onSearch={(q) => setContactSearch(q)}
               onToggleContact={handleToggleRecipient}
               onSelectAll={handleSelectAll}
             />
@@ -249,7 +257,12 @@ export default function BroadcastModal({ open = false, onClose }) {
 
         <div className="broadcast-modal__footer">
           <button type="button" className="broadcast-modal__cancel" onClick={onClose} disabled={saving}>Cancel</button>
-          <button type="button" className="broadcast-modal__send" onClick={handleSave} disabled={saving || !broadcastName || !selectedTemplate || selectedRecipientIds.length === 0}>
+          <button
+            type="button"
+            className="broadcast-modal__send"
+            onClick={handleSave}
+            disabled={saving || !broadcastName?.trim() || (!selectedTemplate && !message?.trim()) || selectedRecipientIds.length === 0}
+          >
             {saving ? 'Saving...' : 'Save Broadcast'}
           </button>
         </div>

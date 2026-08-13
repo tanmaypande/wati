@@ -35,35 +35,57 @@ async function getBroadcast(req, res) {
 async function createBroadcast(req, res) {
   try {
     const { title, message, templateId, recipientIds, recipientCount, status } = req.body;
+    const prisma = require('../config/prismaClient');
 
-    if (!title) {
-      const err = new Error('Title is required');
+    if (!title || !title.trim()) {
+      const err = new Error('Broadcast name is required');
       err.status = 400;
       throw err;
     }
+
+    let finalMessage = message;
     if (templateId) {
-      await templateService.getTemplate({ id: templateId, workspaceId: req.user.workspaceId });
-    } else {
-      const err = new Error('Template is required');
-      err.status = 400;
-      throw err;
+      try {
+        const template = await templateService.getTemplate({ id: templateId, workspaceId: req.user.workspaceId });
+        if (!finalMessage) {
+          finalMessage = template?.body;
+        }
+      } catch (err) {
+        console.warn('Template fetch notice:', err.message);
+      }
     }
-    if (!recipientIds || !Array.isArray(recipientIds) || recipientIds.length === 0) {
-      const err = new Error('At least one recipient is required');
+
+    if (!finalMessage || !finalMessage.trim()) {
+      const err = new Error('Broadcast message content or template is required');
       err.status = 400;
       throw err;
     }
 
     const broadcast = await broadcastService.createBroadcast({
       workspaceId: req.user.workspaceId,
-      title,
-      message,
-      templateId,
-      recipientIds,
-      recipientCount: recipientCount || recipientIds.length,
-      status: status || 'DRAFT',
-      createdBy: req.user && req.user.id
+      title: title.trim(),
+      message: finalMessage.trim(),
     });
+
+    // Send broadcast messages to recipients via WhatsApp API if recipientIds provided
+    if (recipientIds && Array.isArray(recipientIds) && recipientIds.length > 0) {
+      try {
+        const contacts = await prisma.contact.findMany({
+          where: { id: { in: recipientIds }, workspaceId: req.user.workspaceId },
+          select: { phone: true }
+        });
+        const whatsappService = require('../services/whatsappService');
+        for (const contact of contacts) {
+          if (contact.phone) {
+            whatsappService.sendTextMessage(contact.phone, finalMessage.trim()).catch((err) => {
+              console.warn('Broadcast dispatch notice:', err.message);
+            });
+          }
+        }
+      } catch (dispatchErr) {
+        console.warn('Broadcast dispatch notice:', dispatchErr.message);
+      }
+    }
 
     return res.status(201).json({ success: true, data: broadcast });
   } catch (err) {
