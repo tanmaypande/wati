@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowRight, FaComments, FaEnvelope, FaLock, FaUser } from 'react-icons/fa';
+import { FaArrowRight, FaComments, FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAuth } from '../context/useAuth';
 import '../styles/Login.css';
 
@@ -10,6 +10,8 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -111,7 +113,22 @@ export default function Register() {
               <span>Password</span>
               <div className="input-icon-group">
                 <FaLock />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter a password" required />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter a password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
               </div>
               <small className="password-hint">Password must be at least 8 characters and include upper, lower, number and special character.</small>
             </label>
@@ -120,7 +137,22 @@ export default function Register() {
               <span>Confirm Password</span>
               <div className="input-icon-group">
                 <FaLock />
-                <input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} placeholder="Confirm password" required />
+                <input
+                  type={showPasswordConfirm ? 'text' : 'password'}
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  placeholder="Confirm password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                  title={showPasswordConfirm ? 'Hide password' : 'Show password'}
+                  aria-label="Toggle confirm password visibility"
+                >
+                  {showPasswordConfirm ? <FaEyeSlash /> : <FaEye />}
+                </button>
               </div>
             </label>
 

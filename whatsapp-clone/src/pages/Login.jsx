@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowRight, FaComments, FaEnvelope, FaLock, FaShieldAlt } from 'react-icons/fa';
+import { FaArrowRight, FaComments, FaEnvelope, FaLock, FaShieldAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAuth } from '../context/useAuth';
 import '../styles/Login.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -105,7 +106,22 @@ export default function Login() {
               <span>Password</span>
               <div className="input-icon-group">
                 <FaLock />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
               </div>
             </label>
 
