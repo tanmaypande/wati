@@ -3,6 +3,7 @@ import { FiUser } from "react-icons/fi";
 import "../styles/dashboard.css";
 import { fetchOverview, fetchRecent, fetchMessagesChart } from "../services/dashboardApi";
 import { getAccessToken } from "../services/tokenService";
+import { API_ORIGIN } from "../services/api";
 import { io } from "socket.io-client";
 
 function Dashboard() {
@@ -21,21 +22,24 @@ function Dashboard() {
 
   const socketRef = useRef(null);
 
-  async function loadData() {
+  const loadData = async () => {
     try {
-      const ov = await fetchOverview();
-      setOverview(ov);
+      const data = await fetchOverview();
+      setOverview(data || {});
 
-      const rc = await fetchRecent(6);
-      setRecent(rc);
+      const recentChats = await fetchRecent(5);
+      setRecent(recentChats || []);
 
-      const chart = await fetchMessagesChart(1); // messages today
-      if (Array.isArray(chart) && chart.length > 0) {
-        setMessagesToday(chart[chart.length - 1].count || 0);
+      const points = await fetchMessagesChart(7);
+      if (Array.isArray(points) && points.length > 0) {
+        const last = points[points.length - 1];
+        setMessagesToday(last.count || 0);
+      } else {
+        setMessagesToday(0);
       }
-
+      
       // Use broadcastCount from overview for broadcastSent display
-      setBroadcastSent(ov.broadcastCount || 0);
+      setBroadcastSent(data?.broadcastCount || 0);
     } catch (err) {
       console.error('Failed to load dashboard data', err);
     }
@@ -46,9 +50,7 @@ function Dashboard() {
       void loadData();
     }, 0);
 
-    // Setup socket connection for live updates
-    const API_ORIGIN = import.meta.env.VITE_API_URL || "http://localhost:4000";
-    // include auth token in socket auth payload if present
+    // Setup socket connection for live updates using centralized API_ORIGIN
     const token = getAccessToken();
     const socket = io(API_ORIGIN, {
       autoConnect: false,

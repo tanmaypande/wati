@@ -1,11 +1,15 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 import { getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, clearTokens } from './tokenService';
 import { refresh as refreshAuth } from './authApi';
-export const API_ORIGIN = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
+const rawUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').trim().replace(/\/$/, '');
+export const API_ORIGIN = rawUrl.endsWith('/api') ? rawUrl.slice(0, -4) : rawUrl;
+
 const api = axios.create({
   baseURL: `${API_ORIGIN}/api`,
-  timeout: 10000,
+  timeout: 15000,
 });
+
 // Attach token from tokenService if present
 api.interceptors.request.use((config) => {
   const token = getAccessToken();
@@ -15,6 +19,7 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
 // Response interceptor to handle 401 by attempting refresh
 let isRefreshing = false;
 let refreshPromise = null;
@@ -34,12 +39,12 @@ api.interceptors.response.use(
           const currentRefresh = getRefreshToken();
 
           if (!currentRefresh) {
-          clearTokens();
-          isRefreshing = false;
-          return Promise.reject(error);
+            clearTokens();
+            isRefreshing = false;
+            return Promise.reject(error);
           }
 
-refreshPromise = refreshAuth(currentRefresh)
+          refreshPromise = refreshAuth(currentRefresh)
             .then((data) => {
               setAccessToken(data.accessToken);
               setRefreshToken(data.refreshToken);
@@ -62,4 +67,5 @@ refreshPromise = refreshAuth(currentRefresh)
     return Promise.reject(error);
   }
 );
+
 export default api;

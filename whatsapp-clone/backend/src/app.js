@@ -19,12 +19,33 @@ app.use(helmet());
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
-if (process.env.NODE_ENV === 'production' && !FRONTEND_ORIGIN) {
-  console.error('FRONTEND_ORIGIN must be set in production. Exiting.');
-  process.exit(1);
+// Allowed CORS Origins setup
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'https://wati-taupe.vercel.app',
+];
+
+if (process.env.FRONTEND_ORIGIN) {
+  const envOrigins = process.env.FRONTEND_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);
+  envOrigins.forEach((o) => {
+    if (!allowedOrigins.includes(o)) allowedOrigins.push(o);
+  });
 }
-app.use(cors({ origin: FRONTEND_ORIGIN || '*' }));
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+  })
+);
+
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 
 // Mount Routes
