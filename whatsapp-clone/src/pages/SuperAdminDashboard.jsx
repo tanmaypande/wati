@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SuperAdminLayout from '../components/SuperAdminLayout/SuperAdminLayout';
 import { getPlatformOverview } from '../services/superAdminApi';
-import { FiBriefcase, FiCheckCircle, FiSlash, FiUsers, FiMessageSquare, FiSend, FiUserCheck } from 'react-icons/fi';
+import { FiBriefcase, FiCheckCircle, FiSlash, FiUsers, FiMessageSquare, FiSend, FiUserCheck, FiRefreshCw } from 'react-icons/fi';
 
 export default function SuperAdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -10,22 +10,29 @@ export default function SuperAdminDashboard() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        const data = await getPlatformOverview();
-        setStats(data);
-      } catch (err) {
-        setError(err.response?.data?.message || err.message || 'Failed to load platform stats');
-      } finally {
-        setLoading(false);
-      }
+  const loadData = useCallback(async (showLoader = false) => {
+    try {
+      if (showLoader) setLoading(true);
+      setError('');
+      const data = await getPlatformOverview();
+      setStats(data);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to load platform stats');
+    } finally {
+      setLoading(false);
     }
-    void loadData();
   }, []);
 
-  if (loading) {
+  useEffect(() => {
+    void loadData(true);
+    // Auto-refresh metrics every 30 seconds
+    const interval = setInterval(() => {
+      void loadData(false);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [loadData]);
+
+  if (loading && !stats) {
     return (
       <SuperAdminLayout>
         <div style={{ color: '#94a3b8', textAlign: 'center', padding: '60px 0' }}>Loading Platform Dashboard...</div>
@@ -33,7 +40,7 @@ export default function SuperAdminDashboard() {
     );
   }
 
-  if (error) {
+  if (error && !stats) {
     return (
       <SuperAdminLayout>
         <div style={{ padding: '20px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
@@ -44,25 +51,52 @@ export default function SuperAdminDashboard() {
   }
 
   const cards = [
-    { title: 'Total Companies', count: stats.totalCompanies, icon: <FiBriefcase />, color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.1)' },
-    { title: 'Active Companies', count: stats.activeCompanies, icon: <FiCheckCircle />, color: '#34d399', bg: 'rgba(52, 211, 153, 0.1)' },
-    { title: 'Suspended Companies', count: stats.suspendedCompanies, icon: <FiSlash />, color: '#f87171', bg: 'rgba(248, 113, 113, 0.1)' },
-    { title: 'Total Users', count: stats.totalUsers, icon: <FiUsers />, color: '#a78bfa', bg: 'rgba(167, 139, 250, 0.1)' },
-    { title: 'Active Agents', count: stats.totalAgents, icon: <FiUserCheck />, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)' },
-    { title: 'Total Contacts', count: stats.totalContacts, icon: <FiSend />, color: '#ec4899', bg: 'rgba(236, 72, 153, 0.1)' },
-    { title: 'Total Conversations', count: stats.totalConversations, icon: <FiMessageSquare />, color: '#6366f1', bg: 'rgba(99, 102, 241, 0.1)' },
+    { title: 'Total Companies', count: stats?.totalCompanies ?? 0, icon: <FiBriefcase />, color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.1)' },
+    { title: 'Active Companies', count: stats?.activeCompanies ?? 0, icon: <FiCheckCircle />, color: '#34d399', bg: 'rgba(52, 211, 153, 0.1)' },
+    { title: 'Suspended Companies', count: stats?.suspendedCompanies ?? 0, icon: <FiSlash />, color: '#f87171', bg: 'rgba(248, 113, 113, 0.1)' },
+    { title: 'Total Users', count: stats?.totalUsers ?? 0, icon: <FiUsers />, color: '#a78bfa', bg: 'rgba(167, 139, 250, 0.1)' },
+    { title: 'Active Agents', count: stats?.activeAgents ?? stats?.totalAgents ?? 0, icon: <FiUserCheck />, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)' },
+    { title: 'Total Contacts', count: stats?.totalContacts ?? 0, icon: <FiSend />, color: '#ec4899', bg: 'rgba(236, 72, 153, 0.1)' },
+    { title: 'Total Conversations', count: stats?.totalConversations ?? 0, icon: <FiMessageSquare />, color: '#6366f1', bg: 'rgba(99, 102, 241, 0.1)' },
   ];
 
   return (
     <SuperAdminLayout>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#f8fafc', margin: '0 0 8px 0' }}>
-          Platform Dashboard Overview
-        </h1>
-        <p style={{ color: '#94a3b8', margin: 0, fontSize: '15px' }}>
-          Global metrics across all registered tenant companies and workspace operations.
-        </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#f8fafc', margin: '0 0 8px 0' }}>
+            Platform Dashboard Overview
+          </h1>
+          <p style={{ color: '#94a3b8', margin: 0, fontSize: '15px' }}>
+            Real-time live PostgreSQL database metrics across all tenant companies and workspace operations.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => loadData(true)}
+          style={{
+            padding: '10px 16px',
+            backgroundColor: '#334155',
+            color: '#f8fafc',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <FiRefreshCw /> Refresh Metrics
+        </button>
       </div>
+
+      {error && (
+        <div style={{ padding: '12px 16px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.2)', marginBottom: '20px' }}>
+          {error}
+        </div>
+      )}
 
       {/* Metric Cards Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '36px' }}>
@@ -131,7 +165,7 @@ export default function SuperAdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {stats.recentCompanies.length === 0 ? (
+              {!stats?.recentCompanies || stats.recentCompanies.length === 0 ? (
                 <tr>
                   <td colSpan={7} style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
                     No companies registered yet.

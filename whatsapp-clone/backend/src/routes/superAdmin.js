@@ -19,6 +19,7 @@ router.post('/workspaces/:workspaceId/admins', superAdminController.createWorksp
 
 // Platform User Management
 router.get('/users', superAdminController.listUsers);
+router.post('/users', superAdminController.createPlatformUser);
 router.patch('/users/:userId/active', superAdminController.toggleUserActive);
 
 // Platform Audit Logs & System Health

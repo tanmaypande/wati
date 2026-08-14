@@ -13,6 +13,7 @@ async function getPlatformOverview() {
     inactiveCompanies,
     totalUsers,
     totalAgents,
+    activeAgents,
     totalContacts,
     totalConversations,
     recentCompanies,
@@ -23,6 +24,7 @@ async function getPlatformOverview() {
     prisma.workspace.count({ where: { status: 'INACTIVE' } }),
     prisma.user.count({ where: { role: { in: ['ADMIN', 'AGENT'] } } }),
     prisma.user.count({ where: { role: 'AGENT' } }),
+    prisma.user.count({ where: { role: 'AGENT', isActive: true } }),
     prisma.contact.count(),
     prisma.conversation.count(),
     prisma.workspace.findMany({
@@ -48,6 +50,7 @@ async function getPlatformOverview() {
     inactiveCompanies,
     totalUsers,
     totalAgents,
+    activeAgents,
     totalContacts,
     totalConversations,
     recentCompanies: recentCompanies.map((w) => ({
@@ -459,6 +462,79 @@ async function getSystemHealth() {
   };
 }
 
+async function createPlatformUser({ name, email, password, role = 'ADMIN', workspaceId = null, actorUserId }) {
+  if (!name || !name.trim()) throw new Error('Full name is required');
+  if (!email || !email.trim()) throw new Error('Email address is required');
+  if (!password) throw new Error('Password is required');
+
+  const validRoles = ['SUPER_ADMIN', 'ADMIN', 'AGENT'];
+  if (!validRoles.includes(role)) {
+    const err = new Error(`Invalid role. Allowed: ${validRoles.join(', ')}`);
+    err.status = 400;
+    throw err;
+  }
+
+  if (role !== 'SUPER_ADMIN' && !workspaceId) {
+    const err = new Error('Company Workspace selection is required for ADMIN and AGENT roles.');
+    err.status = 400;
+    throw err;
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!isValidEmail(normalizedEmail)) {
+    const err = new Error('Please provide a valid email address.');
+    err.status = 400;
+    throw err;
+  }
+
+  if (!isValidPassword(password)) {
+    const err = new Error('Password does not meet complexity requirements (Min 8 chars: 1 upper, 1 lower, 1 digit, 1 special).');
+    err.status = 400;
+    throw err;
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+  if (existing) {
+    const err = new Error('Email address is already registered.');
+    err.status = 409;
+    throw err;
+  }
+
+  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+  const createdUser = await prisma.user.create({
+    data: {
+      name: name.trim(),
+      email: normalizedEmail,
+      password: passwordHash,
+      role,
+      workspaceId: role === 'SUPER_ADMIN' ? null : workspaceId,
+      isActive: true,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      workspaceId: true,
+      isActive: true,
+      createdAt: true,
+    },
+  });
+
+  if (actorUserId) {
+    await logAudit({
+      actorUserId,
+      workspaceId: createdUser.workspaceId,
+      action: 'USER_CREATED',
+      targetType: 'User',
+      targetId: createdUser.id,
+      metadata: { email: normalizedEmail, role },
+    });
+  }
+
+  return createdUser;
+}
+
 module.exports = {
   getPlatformOverview,
   listWorkspaces,
@@ -467,6 +543,7 @@ module.exports = {
   updateWorkspaceStatus,
   createWorkspaceAdmin,
   listPlatformUsers,
+  createPlatformUser,
   toggleUserActive,
   getSystemHealth,
 };

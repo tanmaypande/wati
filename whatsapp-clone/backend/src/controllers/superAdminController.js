@@ -128,6 +128,25 @@ async function getSystemHealth(req, res) {
   }
 }
 
+async function createPlatformUser(req, res) {
+  try {
+    const { name, email, password, role, workspaceId } = req.body;
+    const actorUserId = req.user.id;
+    const newUser = await superAdminService.createPlatformUser({
+      name,
+      email,
+      password,
+      role,
+      workspaceId,
+      actorUserId,
+    });
+    return res.status(201).json({ success: true, data: newUser });
+  } catch (err) {
+    console.error('Super Admin Create Platform User Error:', err);
+    return res.status(err.status || 400).json({ success: false, message: err.message });
+  }
+}
+
 module.exports = {
   getOverview,
   listWorkspaces,
@@ -136,6 +155,7 @@ module.exports = {
   updateWorkspaceStatus,
   createWorkspaceAdmin,
   listUsers,
+  createPlatformUser,
   toggleUserActive,
   getAuditLogsHandler,
   getSystemHealth,

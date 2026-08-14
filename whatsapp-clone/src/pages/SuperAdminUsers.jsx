@@ -1,15 +1,26 @@
 import { useEffect, useState } from 'react';
 import SuperAdminLayout from '../components/SuperAdminLayout/SuperAdminLayout';
-import { listPlatformUsers, toggleUserActive } from '../services/superAdminApi';
-import { FiSearch, FiUsers, FiShield, FiUserCheck, FiUserX } from 'react-icons/fi';
+import { listPlatformUsers, toggleUserActive, createPlatformUser, listWorkspaces } from '../services/superAdminApi';
+import { FiSearch, FiUsers, FiShield, FiUserCheck, FiUserX, FiPlus } from 'react-icons/fi';
 
 export default function SuperAdminUsers() {
   const [data, setData] = useState({ items: [], total: 0 });
+  const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const [showModal, setShowModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'ADMIN',
+    workspaceId: '',
+  });
 
   async function loadUsers() {
     try {
@@ -23,12 +34,28 @@ export default function SuperAdminUsers() {
     }
   }
 
+  async function loadWorkspacesList() {
+    try {
+      const res = await listWorkspaces({ limit: 100 });
+      setWorkspaces(res.items || []);
+      if (res.items && res.items.length > 0) {
+        setForm((prev) => ({ ...prev, workspaceId: res.items[0].id }));
+      }
+    } catch (err) {
+      console.warn('Failed to load workspaces list for user modal:', err);
+    }
+  }
+
   useEffect(() => {
     const timer = setTimeout(() => {
       void loadUsers();
     }, 300);
     return () => clearTimeout(timer);
   }, [search, roleFilter]);
+
+  useEffect(() => {
+    void loadWorkspacesList();
+  }, []);
 
   async function handleToggleUserActive(user) {
     if (user.role === 'SUPER_ADMIN') {
@@ -47,15 +74,62 @@ export default function SuperAdminUsers() {
     }
   }
 
+  async function handleCreateUser(e) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      await createPlatformUser(form);
+      setSuccess(`User ${form.name} (${form.role}) created successfully!`);
+      setShowModal(false);
+      setForm({ name: '', email: '', password: '', role: 'ADMIN', workspaceId: workspaces[0]?.id || '' });
+      await loadUsers();
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to create platform user');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <SuperAdminLayout>
-      <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#f8fafc', margin: '0 0 8px 0' }}>
-          Platform User Accounts
-        </h1>
-        <p style={{ color: '#94a3b8', margin: 0, fontSize: '15px' }}>
-          Overview and search of all Super Admin, Company Admin, and Agent user accounts across tenants.
-        </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#f8fafc', margin: '0 0 8px 0' }}>
+            Platform User Accounts
+          </h1>
+          <p style={{ color: '#94a3b8', margin: 0, fontSize: '15px' }}>
+            Overview and search of all Super Admin, Company Admin, and Agent user accounts across tenants.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setShowModal(true);
+            setError('');
+            setSuccess('');
+          }}
+          style={{
+            padding: '12px 20px',
+            backgroundColor: '#0284c7',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: '600',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)',
+          }}
+        >
+          <FiPlus style={{ fontSize: '18px' }} />
+          Add Platform User
+        </button>
       </div>
 
       {error && (
@@ -213,6 +287,130 @@ export default function SuperAdminUsers() {
           </table>
         </div>
       </div>
+
+      {/* Modal to Create Platform User */}
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+          padding: '20px',
+        }}>
+          <div style={{
+            backgroundColor: '#1e293b',
+            borderRadius: '12px',
+            border: '1px solid #334155',
+            width: '100%',
+            maxWidth: '520px',
+            padding: '28px',
+            color: '#f8fafc',
+          }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 16px 0' }}>
+              Add Platform User Account
+            </h2>
+
+            <form onSubmit={handleCreateUser}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', color: '#94a3b8', marginBottom: '6px' }}>
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Rahul Sharma"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  style={{ width: '100%', padding: '10px 14px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '6px', color: '#fff' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', color: '#94a3b8', marginBottom: '6px' }}>
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="rahul@example.com"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  style={{ width: '100%', padding: '10px 14px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '6px', color: '#fff' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', color: '#94a3b8', marginBottom: '6px' }}>
+                  Temporary Password * (Min 8 chars: 1 upper, 1 lower, 1 digit, 1 special)
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="e.g. Pass123!"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  style={{ width: '100%', padding: '10px 14px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '6px', color: '#fff' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', color: '#94a3b8', marginBottom: '6px' }}>
+                  User Role *
+                </label>
+                <select
+                  value={form.role}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  style={{ width: '100%', padding: '10px 14px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '6px', color: '#fff' }}
+                >
+                  <option value="ADMIN">ADMIN (Company Administrator)</option>
+                  <option value="AGENT">AGENT (Company Employee / Agent)</option>
+                  <option value="SUPER_ADMIN">SUPER_ADMIN (Platform Operator)</option>
+                </select>
+              </div>
+
+              {form.role !== 'SUPER_ADMIN' && (
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', color: '#94a3b8', marginBottom: '6px' }}>
+                    Assigned Company Workspace *
+                  </label>
+                  <select
+                    required
+                    value={form.workspaceId}
+                    onChange={(e) => setForm({ ...form, workspaceId: e.target.value })}
+                    style={{ width: '100%', padding: '10px 14px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '6px', color: '#fff' }}
+                  >
+                    {workspaces.map((w) => (
+                      <option key={w.id} value={w.id}>
+                        {w.name} ({w.slug})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  style={{ padding: '10px 18px', backgroundColor: '#334155', color: '#cbd5e1', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={{ padding: '10px 20px', backgroundColor: '#0284c7', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  {submitting ? 'Creating...' : 'Create Platform User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </SuperAdminLayout>
   );
 }

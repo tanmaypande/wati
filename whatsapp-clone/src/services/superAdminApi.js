@@ -35,6 +35,11 @@ export async function listPlatformUsers(params = {}) {
   return response.data.data;
 }
 
+export async function createPlatformUser(data) {
+  const response = await api.post('/super-admin/users', data);
+  return response.data.data;
+}
+
 export async function toggleUserActive(userId, isActive) {
   const response = await api.patch(`/super-admin/users/${userId}/active`, { isActive });
   return response.data.data;
