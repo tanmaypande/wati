@@ -10,10 +10,5 @@ export default function PrivateRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  // If user is Platform Super Admin, redirect to Super Admin portal
-  if (user.role === 'SUPER_ADMIN') {
-    return <Navigate to="/super-admin" replace />;
-  }
-
   return children;
 }

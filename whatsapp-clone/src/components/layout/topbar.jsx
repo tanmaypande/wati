@@ -161,7 +161,7 @@ function TopBar({ onToggleSidebar }) {
             </div>
             <div className="topbar-profile-details">
               <span className="topbar-profile-name">{displayName}</span>
-              <span className={`topbar-profile-role ${user?.role === 'ADMIN' ? 'admin' : 'agent'}`}>
+              <span className={`topbar-profile-role ${user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN' ? 'admin' : 'agent'}`}>
                 {user?.role || "USER"}
               </span>
             </div>
@@ -177,7 +177,7 @@ function TopBar({ onToggleSidebar }) {
                     <div className="popover-user-name">{user?.name || "User"}</div>
                     {user?.email && <div className="popover-user-meta">{user.email}</div>}
                     {user?.role && (
-                      <span className={`topbar-profile-role ${user?.role === 'ADMIN' ? 'admin' : 'agent'}`}>
+                      <span className={`topbar-profile-role ${user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN' ? 'admin' : 'agent'}`}>
                         {user.role}
                       </span>
                     )}

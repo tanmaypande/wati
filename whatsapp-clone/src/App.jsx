@@ -7,11 +7,10 @@ function AppContent() {
   const location = useLocation();
   const path = location.pathname;
 
-  // Super Admin routes and auth/landing routes do NOT use the employee workspace Layout
-  const isSuperAdmin = path.startsWith('/super-admin');
-  const hideEmployeeLayout = ['/login', '/register', '/verify-email', '/workspace-suspended', '/'].includes(path) || isSuperAdmin;
+  // Public/Auth routes do not use the workspace Layout
+  const hideLayout = ['/login', '/register', '/verify-email', '/workspace-suspended', '/'].includes(path);
 
-  if (hideEmployeeLayout) {
+  if (hideLayout) {
     return <AppRoutes />;
   }
 
