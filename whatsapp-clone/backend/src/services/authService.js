@@ -286,7 +286,9 @@ async function resendVerification({ email }) {
 
 // Login with Workspace token payload and Session logging
 async function login({ email, password }) {
-  const user = await prisma.user.findUnique({ where: { email }, include: { workspace: true } });
+  if (!email || !password) throw new Error('Invalid credentials');
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail }, include: { workspace: true } });
   if (!user) throw new Error('Invalid credentials');
 
   if (user.isActive === false) {

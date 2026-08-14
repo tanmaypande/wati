@@ -25,7 +25,7 @@ export default function Register() {
 
   const passwordMeets = (pw) => {
     if (!pw || typeof pw !== 'string') return false;
-    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8}$/;
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,100}$/;
     return re.test(pw);
   };
 
@@ -111,16 +111,16 @@ export default function Register() {
               <span>Password</span>
               <div className="input-icon-group">
                 <FaLock />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter a password" maxLength={8} required />
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter a password" required />
               </div>
-              <small className="password-hint">Password must be exactly 8 characters and include upper, lower, number and special character.</small>
+              <small className="password-hint">Password must be at least 8 characters and include upper, lower, number and special character.</small>
             </label>
 
             <label className="login-field">
               <span>Confirm Password</span>
               <div className="input-icon-group">
                 <FaLock />
-                <input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} placeholder="Confirm password" maxLength={8} required />
+                <input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} placeholder="Confirm password" required />
               </div>
             </label>
 
