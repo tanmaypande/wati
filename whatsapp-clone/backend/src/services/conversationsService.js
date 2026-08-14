@@ -50,8 +50,9 @@ async function createConversation({ contactId, assignedToId, status = 'OPEN', wo
 }
 
 async function listConversations({ q, workspaceId, userId, role } = {}) {
-  // Scoping: ADMIN sees all workspace conversations; AGENT sees assigned conversations or unassigned in workspace
-  const roleWhere = role === 'ADMIN'
+  // Scoping: SUPER_ADMIN and ADMIN see all workspace conversations; AGENT sees assigned conversations or unassigned in workspace
+  const isAdminRole = role === 'SUPER_ADMIN' || role === 'ADMIN';
+  const roleWhere = isAdminRole
     ? { workspaceId }
     : { workspaceId, OR: [{ assignedToId: userId }, { assignedToId: null }] };
 
@@ -86,7 +87,8 @@ async function listConversations({ q, workspaceId, userId, role } = {}) {
 }
 
 async function getConversation({ id, workspaceId, userId, role }) {
-  const roleWhere = role === 'ADMIN'
+  const isAdminRole = role === 'SUPER_ADMIN' || role === 'ADMIN';
+  const roleWhere = isAdminRole
     ? { id, workspaceId }
     : { id, workspaceId, OR: [{ assignedToId: userId }, { assignedToId: null }] };
 
@@ -196,7 +198,7 @@ async function sendMessage({ conversationId, content, sender = 'AGENT', workspac
   try {
     const whatsappService = require('./whatsappService');
     if (conversation.contact?.phone) {
-      await whatsappService.sendTextMessage(conversation.contact.phone, content.trim()).catch((err) => {
+      await whatsappService.sendTextMessage(conversation.contact.phone, content.trim(), workspaceId).catch((err) => {
         console.warn('WhatsApp Cloud API notice:', err.message);
       });
     }

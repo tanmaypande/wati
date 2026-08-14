@@ -10,6 +10,7 @@ const templatesRoutes = require('./routes/templates');
 const broadcastsRoutes = require('./routes/broadcasts');
 const whatsappRoutes = require('./routes/whatsapp');
 const agentsRoutes = require('./routes/agents');
+const workspaceRoutes = require('./routes/workspace');
 const superAdminRoutes = require('./routes/superAdmin');
 const ensureSuperAdmin = require('./utils/seedSuperAdmin');
 
@@ -57,6 +58,7 @@ app.use('/api/templates', templatesRoutes);
 app.use('/api/broadcasts', broadcastsRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/agents', agentsRoutes);
+app.use('/api/workspace', workspaceRoutes);
 app.use('/api/super-admin', superAdminRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));

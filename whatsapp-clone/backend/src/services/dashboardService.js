@@ -8,28 +8,59 @@ const { Prisma } = require('@prisma/client');
  */
 async function getOverview(workspaceId) {
   const totalContactsPromise = prisma.contact.count({ where: { workspaceId } });
+  const totalEmployeesPromise = prisma.user.count({ where: { workspaceId, role: 'AGENT' } });
   const totalConversationsPromise = prisma.conversation.count({ where: { workspaceId } });
   const activeConversationsPromise = prisma.conversation.count({ where: { status: 'OPEN', workspaceId } });
+  const pendingConversationsPromise = prisma.conversation.count({ where: { status: 'PENDING', workspaceId } });
   const closedConversationsPromise = prisma.conversation.count({ where: { status: 'CLOSED', workspaceId } });
   const broadcastCountPromise = prisma.broadcast.count({ where: { workspaceId } });
   const templatesCountPromise = prisma.template.count({ where: { workspaceId } });
+  const workspacePromise = prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { id: true, name: true, status: true, createdAt: true },
+  });
+  const whatsappAccountPromise = prisma.whatsAppAccount.findUnique({
+    where: { workspaceId },
+    select: { status: true, phoneNumberId: true },
+  });
 
-  const [totalContacts, totalConversations, activeConversations, closedConversations, broadcastCount, templatesCount] = await Promise.all([
+  const [
+    totalContacts,
+    totalEmployees,
+    totalConversations,
+    activeConversations,
+    pendingConversations,
+    closedConversations,
+    broadcastCount,
+    templatesCount,
+    workspace,
+    whatsappAccount,
+  ] = await Promise.all([
     totalContactsPromise,
+    totalEmployeesPromise,
     totalConversationsPromise,
     activeConversationsPromise,
+    pendingConversationsPromise,
     closedConversationsPromise,
     broadcastCountPromise,
     templatesCountPromise,
+    workspacePromise,
+    whatsappAccountPromise,
   ]);
 
   return {
     totalContacts,
+    totalEmployees,
     totalConversations,
     activeConversations,
+    openConversations: activeConversations,
+    pendingConversations,
     closedConversations,
     broadcastCount,
     templatesCount,
+    workspace,
+    whatsappStatus: whatsappAccount?.status || 'INACTIVE',
+    whatsappPhoneNumberId: whatsappAccount?.phoneNumberId || null,
   };
 }
 

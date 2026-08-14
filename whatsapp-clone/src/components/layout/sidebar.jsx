@@ -17,7 +17,7 @@ function Sidebar({ open, onClose }) {
     { to: "/dashboard", label: "Dashboard", icon: <FiGrid /> },
     { to: "/chats", label: "Chats", icon: <FiMessageSquare /> },
     { to: "/contacts", label: "Contacts", icon: <FiUsers /> },
-    // ...(user?.role === 'ADMIN' ? [{ to: "/agents", label: "Team Agents", icon: <FiShield /> }] : []),
+    ...(user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN' ? [{ to: "/agents", label: "Team Employees", icon: <FiShield /> }] : []),
     { to: "/broadcast", label: "Broadcast", icon: <FiSend /> },
     { to: "/templates", label: "Templates", icon: <FiFileText /> },
     { to: "/analytics", label: "Analytics", icon: <FiBarChart2 /> },

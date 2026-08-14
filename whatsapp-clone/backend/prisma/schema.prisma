@@ -161,6 +161,7 @@ model EmailVerification {
   createdAt    DateTime  @default(now())
   lastSentAt   DateTime?
   name         String
+  companyName  String?
   passwordHash String
 
   @@index([email])

@@ -63,12 +63,12 @@ function Agents() {
     }
   };
 
-  if (user?.role !== 'ADMIN') {
+  if (user?.role !== 'SUPER_ADMIN' && user?.role !== 'ADMIN') {
     return (
       <div className="contacts-page" style={{ padding: '2rem' }}>
         <div className="alert alert-danger">
           <h3>Access Restricted</h3>
-          <p>Only Workspace Administrators can manage team agents.</p>
+          <p>Only Company Super Admins can manage team employees and agents.</p>
         </div>
       </div>
     );

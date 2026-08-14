@@ -14,8 +14,8 @@ function mapErrorToStatus(err) {
 
 async function register(req, res) {
   try {
-    const { name, email, password } = req.body;
-    const result = await authService.register({ name, email, password });
+    const { name, companyName, email, password } = req.body;
+    const result = await authService.register({ name, companyName, email, password });
     // result: { message: 'Verification code sent' }
     return res.status(201).json({ success: true, data: result });
   } catch (err) {

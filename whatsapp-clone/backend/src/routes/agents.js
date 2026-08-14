@@ -10,10 +10,10 @@ router.use(authenticate);
 // List workspace agents (accessible to ADMIN and AGENT for UI dropdowns)
 router.get('/', controller.listAgents);
 
-// Create agent in workspace (ADMIN only)
-router.post('/', authorize(['ADMIN']), controller.createAgent);
+// Create agent in workspace (SUPER_ADMIN and ADMIN)
+router.post('/', authorize(['SUPER_ADMIN', 'ADMIN']), controller.createAgent);
 
-// Delete/deactivate agent from workspace (ADMIN only)
-router.delete('/:id', authorize(['ADMIN']), controller.deleteAgent);
+// Delete/deactivate agent from workspace (SUPER_ADMIN and ADMIN)
+router.delete('/:id', authorize(['SUPER_ADMIN', 'ADMIN']), controller.deleteAgent);
 
 module.exports = router;

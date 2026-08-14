@@ -29,7 +29,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={user?.role === 'SUPER_ADMIN' ? <Navigate to="/super-admin" replace /> : <Landing />} />
+      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
@@ -44,14 +44,6 @@ function AppRoutes() {
       <Route path="/templates" element={<PrivateRoute><Template /></PrivateRoute>} />
       <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
       <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-
-      {/* Super Admin Platform Portal Routes */}
-      <Route path="/super-admin" element={<SuperAdminRoute><SuperAdminDashboard /></SuperAdminRoute>} />
-      <Route path="/super-admin/companies" element={<SuperAdminRoute><SuperAdminCompanies /></SuperAdminRoute>} />
-      <Route path="/super-admin/companies/:workspaceId" element={<SuperAdminRoute><SuperAdminCompanyDetail /></SuperAdminRoute>} />
-      <Route path="/super-admin/users" element={<SuperAdminRoute><SuperAdminUsers /></SuperAdminRoute>} />
-      <Route path="/super-admin/audit-logs" element={<SuperAdminRoute><SuperAdminAuditLogs /></SuperAdminRoute>} />
-      <Route path="/super-admin/settings" element={<SuperAdminRoute><SuperAdminSettings /></SuperAdminRoute>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

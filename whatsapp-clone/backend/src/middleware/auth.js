@@ -12,14 +12,12 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid token claims' });
     }
 
-    // SUPER_ADMIN has workspaceId = null; ADMIN/AGENT must have workspaceId
-    if (payload.role !== 'SUPER_ADMIN' && !payload.workspaceId) {
+    // Every tenant user (SUPER_ADMIN, ADMIN, AGENT) must have a valid workspaceId
+    if (!payload.workspaceId) {
       return res.status(401).json({ message: 'Invalid tenant context in token' });
     }
 
     const userId = payload.userId;
-    const role = payload.role;
-    const workspaceId = payload.role === 'SUPER_ADMIN' ? null : payload.workspaceId;
 
     // Fast status check in DB
     const userRecord = await prisma.user.findUnique({
@@ -27,15 +25,15 @@ const authenticate = async (req, res, next) => {
       select: { isActive: true, role: true, workspaceId: true, workspace: { select: { status: true } } },
     });
 
-    if (!userRecord) {
-      return res.status(401).json({ message: 'User account no longer exists' });
+    if (!userRecord || !userRecord.workspaceId) {
+      return res.status(401).json({ message: 'User account or workspace no longer exists' });
     }
 
     if (!userRecord.isActive) {
       return res.status(403).json({ message: 'Your account has been deactivated.' });
     }
 
-    if (userRecord.role !== 'SUPER_ADMIN' && userRecord.workspace) {
+    if (userRecord.workspace) {
       if (userRecord.workspace.status === 'SUSPENDED') {
         return res.status(403).json({
           message: 'Workspace is suspended. Access denied. Please contact platform administrator.',
@@ -48,7 +46,7 @@ const authenticate = async (req, res, next) => {
       id: userId,
       userId,
       role: userRecord.role,
-      workspaceId: userRecord.role === 'SUPER_ADMIN' ? null : userRecord.workspaceId,
+      workspaceId: userRecord.workspaceId,
     };
 
     return next();

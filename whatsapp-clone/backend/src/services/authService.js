@@ -108,7 +108,7 @@ function generateOtp() {
 }
 
 // New register: create verification record and send OTP. Do NOT create User yet.
-async function register({ name, email, password, role = 'AGENT' }) {
+async function register({ name, companyName, email, password }) {
   if (!name || !email || !password) throw new Error('Name, email and password are required');
   const normalized = email.trim().toLowerCase();
   if (!isValidEmail(normalized)) {
@@ -134,7 +134,17 @@ async function register({ name, email, password, role = 'AGENT' }) {
   const otpHash = await bcrypt.hash(otp, SALT_ROUNDS);
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-  const verificationRecord = await prisma.emailVerification.create({ data: { email: normalized, otpHash, name, passwordHash, expiresAt, lastSentAt: new Date() } });
+  const verificationRecord = await prisma.emailVerification.create({
+    data: {
+      email: normalized,
+      otpHash,
+      name: name.trim(),
+      companyName: companyName ? companyName.trim() : null,
+      passwordHash,
+      expiresAt,
+      lastSentAt: new Date(),
+    },
+  });
 
   try {
     await sendVerificationEmail(normalized, otp);
@@ -146,7 +156,7 @@ async function register({ name, email, password, role = 'AGENT' }) {
   return { message: 'Verification code sent' };
 }
 
-// Verify OTP and create the user after successful verification (no automatic login)
+// Verify OTP and create the workspace & super admin user after successful verification
 async function verifyEmail({ email, otp }) {
   if (!email || !otp) throw new Error('Email and OTP are required');
   const normalized = email.trim().toLowerCase();
@@ -180,11 +190,17 @@ async function verifyEmail({ email, otp }) {
     throw new Error('Invalid verification code.');
   }
 
-  // create workspace and admin user
+  // Determine workspace name from companyName or fallback to owner's name
+  const workspaceName = record.companyName && record.companyName.trim()
+    ? record.companyName.trim()
+    : `${record.name.trim()}'s Workspace`;
+  const slugBase = (record.companyName || record.name).trim().toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+  // create workspace and super admin user
   const workspace = await prisma.workspace.create({
     data: {
-      name: `${record.name.trim()}'s Workspace`,
-      slug: `${record.name.trim().toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString(36)}`,
+      name: workspaceName,
+      slug: `${slugBase}-${Date.now().toString(36)}`,
     },
   });
 
@@ -193,14 +209,14 @@ async function verifyEmail({ email, otp }) {
       name: record.name,
       email: normalized,
       password: record.passwordHash,
-      role: 'ADMIN',
+      role: 'SUPER_ADMIN',
       workspaceId: workspace.id,
     },
   });
 
   await prisma.emailVerification.update({ where: { id: record.id }, data: { used: true } });
 
-  // create initial session record (no tokens returned)
+  // create initial session record
   await prisma.session.create({ data: { userId: user.id } });
 
   return { message: 'Email verified and workspace account created' };
@@ -242,9 +258,21 @@ async function resendVerification({ email }) {
   await prisma.emailVerification.updateMany({ where: { email: normalized, used: false }, data: { used: true } });
 
   const name = recent ? recent.name : '';
+  const companyName = recent ? recent.companyName : null;
   const passwordHash = recent ? recent.passwordHash : '';
 
-  const verificationRecord = await prisma.emailVerification.create({ data: { email: normalized, otpHash, name, passwordHash, expiresAt, lastSentAt: new Date(), resendCount: recent ? recent.resendCount + 1 : 1 } });
+  const verificationRecord = await prisma.emailVerification.create({
+    data: {
+      email: normalized,
+      otpHash,
+      name,
+      companyName,
+      passwordHash,
+      expiresAt,
+      lastSentAt: new Date(),
+      resendCount: recent ? recent.resendCount + 1 : 1,
+    },
+  });
 
   try {
     await sendVerificationEmail(normalized, otp);
@@ -267,7 +295,7 @@ async function login({ email, password }) {
     throw err;
   }
 
-  if (user.role !== 'SUPER_ADMIN' && user.workspace && user.workspace.status === 'SUSPENDED') {
+  if (user.workspace && user.workspace.status === 'SUSPENDED') {
     const err = new Error('Workspace is suspended. Access denied. Please contact platform administrator.');
     err.status = 403;
     err.code = 'WORKSPACE_SUSPENDED';
@@ -277,7 +305,7 @@ async function login({ email, password }) {
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error('Invalid credentials');
 
-  const workspaceId = user.role === 'SUPER_ADMIN' ? null : user.workspaceId;
+  const workspaceId = user.workspaceId;
   const payload = { userId: user.id, role: user.role, workspaceId };
 
   const accessToken = signAccessToken(payload);
@@ -295,7 +323,7 @@ async function login({ email, password }) {
       email: user.email,
       role: user.role,
       workspaceId,
-      workspaceName: user.role === 'SUPER_ADMIN' ? 'Platform Operator' : user.workspace?.name,
+      workspaceName: user.workspace?.name,
     },
     accessToken,
     refreshToken,

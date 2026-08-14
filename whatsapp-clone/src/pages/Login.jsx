@@ -53,12 +53,8 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      const res = await login({ email, password });
-      if (res?.user?.role === 'SUPER_ADMIN') {
-        navigate('/super-admin', { replace: true });
-      } else {
-        navigate('/dashboard', { replace: true });
-      }
+      await login({ email, password });
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       const msg = err?.response?.data?.message || err.message || 'Login failed';
       if (msg.includes('suspended') || err?.response?.data?.code === 'WORKSPACE_SUSPENDED') {

@@ -6,6 +6,7 @@ import '../styles/Login.css';
 
 export default function Register() {
   const [name, setName] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -46,7 +47,7 @@ export default function Register() {
     setLoading(true);
     try {
       const normalizedEmail = email.trim().toLowerCase();
-      await register({ name, email: normalizedEmail, password });
+      await register({ name, companyName, email: normalizedEmail, password });
       // Navigate to verify-email page where user can enter the OTP
       navigate('/verify-email', { state: { email: normalizedEmail } });
     } catch (err) {
@@ -62,8 +63,8 @@ export default function Register() {
         <div className="login-hero">
           <div className="login-glow" />
           <div className="login-badge">Secure Workspace</div>
-          <h1>Create your account</h1>
-          <p>Manage conversations, track replies, and keep every customer interaction moving smoothly.</p>
+          <h1>Create your company account</h1>
+          <p>Register your company workspace and access complete customer communication tools.</p>
 
           <ul className="login-highlights">
             <li><FaComments /> Live conversations</li>
@@ -76,17 +77,25 @@ export default function Register() {
           <div className="login-card-header">
             <div className="login-card-icon">W</div>
             <div>
-              <h2>Create Account</h2>
-              <p>Set up your workspace account</p>
+              <h2>Create Company Account</h2>
+              <p>Set up your company workspace</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
             <label className="login-field">
-              <span>Name</span>
+              <span>Company / Brand Name</span>
               <div className="input-icon-group">
                 <FaUser />
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required />
+                <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. Tanmay Clothing" required />
+              </div>
+            </label>
+
+            <label className="login-field">
+              <span>Owner Name</span>
+              <div className="input-icon-group">
+                <FaUser />
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" required />
               </div>
             </label>
 

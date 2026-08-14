@@ -5,15 +5,21 @@ import { fetchOverview, fetchRecent, fetchMessagesChart } from "../services/dash
 import { getAccessToken } from "../services/tokenService";
 import { API_ORIGIN } from "../services/api";
 import { io } from "socket.io-client";
+import { useAuth } from "../context/useAuth";
 
 function Dashboard() {
+  const { user } = useAuth();
   const [overview, setOverview] = useState({
     totalContacts: 0,
+    totalEmployees: 0,
     totalConversations: 0,
     activeConversations: 0,
+    openConversations: 0,
+    pendingConversations: 0,
     closedConversations: 0,
     broadcastCount: 0,
     templatesCount: 0,
+    whatsappStatus: 'INACTIVE',
   });
 
   const [recent, setRecent] = useState([]);
@@ -83,29 +89,29 @@ function Dashboard() {
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>Dashboard</h1>
-        <p>Welcome back, {UserActivation}</p>
+        <p>Welcome back, {user?.name || user?.email || 'User'}{user?.workspaceName ? ` • ${user.workspaceName}` : ''}</p>
       </div>
 
       {/* Statistics */}
       <div className="stats-grid">
         <div className="stat-card">
-          <h2>{overview.totalContacts}</h2>
+          <h2>{overview.totalContacts ?? 0}</h2>
           <p>Total Contacts</p>
         </div>
 
         <div className="stat-card">
-          <h2>{overview.activeConversations}</h2>
-          <p>Active Chats</p>
+          <h2>{overview.totalEmployees ?? 0}</h2>
+          <p>Total Employees</p>
         </div>
 
         <div className="stat-card">
-          <h2>{overview.totalConversations - overview.activeConversations}</h2>
-          <p>Pending Replies</p>
+          <h2>{overview.totalConversations ?? 0}</h2>
+          <p>Total Conversations</p>
         </div>
 
         <div className="stat-card">
-          <h2>{overview.totalConversations > 0 ? Math.round((overview.totalConversations - overview.closedConversations) / overview.totalConversations * 100) + "%" : "0%"}</h2>
-          <p>Response Rate</p>
+          <h2>{overview.activeConversations ?? 0}</h2>
+          <p>Open Conversations</p>
         </div>
       </div>
       {/* Bottom Section */}
