@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd whatsapp-clone && npm install && npm run build",
+  "outputDirectory": "whatsapp-clone/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
