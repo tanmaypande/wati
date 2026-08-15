@@ -49,9 +49,19 @@ export default function Login() {
     );
   }
 
+  const passwordMeets = (pw) => {
+    if (!pw || typeof pw !== 'string') return false;
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,100}$/;
+    return re.test(pw);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    if (!passwordMeets(password)) {
+      setError('Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.');
+      return;
+    }
     setLoading(true);
     try {
       await login({ email, password });
@@ -123,6 +133,7 @@ export default function Login() {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
+              <small className="password-hint">Must be at least 8 characters with upper, lower, number & special char.</small>
             </label>
 
             {error && <div className="login-error">{error}</div>}

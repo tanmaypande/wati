@@ -5,9 +5,11 @@ function mapErrorToStatus(err) {
   if (err.status) return err.status;
   const msg = (err.message || '').toLowerCase();
   if (msg.includes('email already registered') || msg.includes('already registered')) return 409;
+  if (msg.includes('incorrect password') || msg.includes('incorrect current')) return 401;
   if (msg.includes('invalid credentials')) return 401;
+  if (msg.includes('password requirements')) return 400;
+  if (msg.includes('user not found') || msg.includes('no account found')) return 404;
   if (msg.includes('invalid refresh token') || msg.includes('refresh token expired') || msg.includes('invalid or used token') || msg.includes('token expired')) return 401;
-  if (msg.includes('current password') || msg.includes('incorrect current')) return 403;
   // default to 400 for known domain errors; let global handler treat true server errors
   return 400;
 }

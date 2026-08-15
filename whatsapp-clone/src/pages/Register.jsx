@@ -43,7 +43,7 @@ export default function Register() {
       return;
     }
     if (!passwordMeets(password)) {
-      setError('Password does not meet requirements.');
+      setError('Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.');
       return;
     }
     setLoading(true);

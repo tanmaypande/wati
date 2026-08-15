@@ -116,9 +116,9 @@ async function register({ name, companyName, email, password }) {
     err.status = 400;
     throw err;
   }
-  // password validation: enforce exactly 8 chars and required classes
+  // password validation: enforce requirements
   if (!isValidPassword(password)) {
-    const err = new Error('Password does not meet requirements');
+    const err = new Error('Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.');
     err.status = 400;
     throw err;
   }
@@ -286,10 +286,24 @@ async function resendVerification({ email }) {
 
 // Login with Workspace token payload and Session logging
 async function login({ email, password }) {
-  if (!email || !password) throw new Error('Invalid credentials');
+  if (!email || !password) {
+    const err = new Error('Email and password are required.');
+    err.status = 400;
+    throw err;
+  }
+  if (!isValidPassword(password)) {
+    const err = new Error('Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.');
+    err.status = 400;
+    throw err;
+  }
+
   const normalizedEmail = email.trim().toLowerCase();
   const user = await prisma.user.findUnique({ where: { email: normalizedEmail }, include: { workspace: true } });
-  if (!user) throw new Error('Invalid credentials');
+  if (!user) {
+    const err = new Error('No account found with this email.');
+    err.status = 404;
+    throw err;
+  }
 
   if (user.isActive === false) {
     const err = new Error('Your account has been deactivated.');
@@ -305,7 +319,11 @@ async function login({ email, password }) {
   }
 
   const match = await bcrypt.compare(password, user.password);
-  if (!match) throw new Error('Invalid credentials');
+  if (!match) {
+    const err = new Error('Incorrect password');
+    err.status = 401;
+    throw err;
+  }
 
   const workspaceId = user.workspaceId;
   const payload = { userId: user.id, role: user.role, workspaceId };
@@ -387,7 +405,7 @@ async function resetPassword({ token, newPassword }) {
   if (!record || record.used) throw new Error('Invalid or used token');
   if (record.expiresAt < new Date()) throw new Error('Token expired');
   if (!isValidPassword(newPassword)) {
-    const err = new Error('Password does not meet requirements');
+    const err = new Error('Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.');
     err.status = 400;
     throw err;
   }
@@ -416,7 +434,7 @@ async function changePassword({ userId, currentPassword, newPassword }) {
   if (!userId) throw new Error('Missing user id');
   if (!currentPassword || !newPassword) throw new Error('Current password and new password are required');
   if (!isValidPassword(newPassword)) {
-    const err = new Error('Password does not meet requirements');
+    const err = new Error('Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.');
     err.status = 400;
     throw err;
   }
@@ -429,7 +447,7 @@ async function changePassword({ userId, currentPassword, newPassword }) {
   const match = await bcrypt.compare(currentPassword, user.password);
   if (!match) {
     const err = new Error('Incorrect current password');
-    err.status = 403;
+    err.status = 401;
     throw err;
   }
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);

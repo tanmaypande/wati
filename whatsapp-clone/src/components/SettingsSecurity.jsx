@@ -12,7 +12,10 @@ export default function SettingsSecurity() {
   function validate() {
     if (!currentPassword) return 'Current password is required';
     if (!newPassword) return 'New password is required';
-    if (newPassword.length < 8) return 'New password must be at least 8 characters';
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,100}$/;
+    if (!re.test(newPassword)) {
+      return 'Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.';
+    }
     if (newPassword !== confirmPassword) return 'Passwords do not match';
     return null;
   }
