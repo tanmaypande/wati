@@ -291,11 +291,6 @@ async function login({ email, password }) {
     err.status = 400;
     throw err;
   }
-  if (!isValidPassword(password)) {
-    const err = new Error('Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.');
-    err.status = 400;
-    throw err;
-  }
 
   const normalizedEmail = email.trim().toLowerCase();
   const user = await prisma.user.findUnique({ where: { email: normalizedEmail }, include: { workspace: true } });

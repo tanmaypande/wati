@@ -58,8 +58,8 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    if (!passwordMeets(password)) {
-      setError('Password requirements not met. Must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.');
+    if (!email || !password) {
+      setError('Please enter both email and password.');
       return;
     }
     setLoading(true);
