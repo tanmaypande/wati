@@ -30,7 +30,7 @@ export default function SuperAdminSidebar({ open, onClose }) {
           </div>
           <div>
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#f8fafc', margin: 0 }}>
-              WATI<span style={{ color: '#38bdf8', marginLeft: '2px' }}>SaaS</span>
+              ConvoNest<span style={{ color: '#38bdf8', marginLeft: '2px' }}>SaaS</span>
             </h2>
             <span style={{ fontSize: '11px', color: '#94a3b8', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>
               Super Admin Portal

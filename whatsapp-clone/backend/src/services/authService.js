@@ -22,7 +22,7 @@ const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10);
 //   SMTP_SECURE=false
 //   SMTP_USER=your.email@gmail.com
 //   SMTP_PASS=your-google-app-password
-//   SMTP_FROM="WATI Clone <your.email@gmail.com>"
+//   SMTP_FROM="ConvoNest <your.email@gmail.com>"
 function getSmtpTransporter() {
   const host = process.env.SMTP_HOST;
   const portValue = process.env.SMTP_PORT;
@@ -60,10 +60,10 @@ async function sendVerificationEmail(toEmail, otp) {
   const mailOptions = {
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: toEmail,
-    subject: 'Verify your WATI Clone account',
-    text: `WATI Clone verification code
+    subject: 'Verify your ConvoNest account',
+    text: `ConvoNest verification code
 
-Your WATI Clone verification code is:
+Your ConvoNest verification code is:
 
 ${otp}
 

@@ -72,8 +72,8 @@ export default function Landing() {
     <div className="landing-page">
       <header className={`landing-navbar ${menuOpen ? 'open' : ''}`}>
         <div className="landing-navbar-brand">
-          <img src="/logo.png" alt="WATI Logo" style={{ height: '38px', width: 'auto', marginRight: '10px', verticalAlign: 'middle' }} />
-          <span>WATI</span> Clone
+          <img src="/logo.png" alt="ConvoNest Logo" style={{ height: '38px', width: 'auto', marginRight: '10px', verticalAlign: 'middle' }} />
+          <span>Convo</span>Nest
         </div>
 
         <button
@@ -129,7 +129,7 @@ export default function Landing() {
             <div className="landing-hero-title-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.25rem' }}>
               <img
                 src="/logo.png"
-                alt="WATI Hero Logo"
+                alt="ConvoNest Hero Logo"
                 style={{
                   width: '72px',
                   height: '72px',
@@ -139,7 +139,7 @@ export default function Landing() {
                   filter: 'drop-shadow(0 10px 20px rgba(37, 211, 102, 0.35))',
                 }}
               />
-              <h1 style={{ margin: 0 }}>Build better customer conversations with WATI Clone.</h1>
+              <h1 style={{ margin: 0 }}>Build better customer conversations with ConvoNest.</h1>
             </div>
             <p>
               Manage WhatsApp chats, contacts, templates, broadcasts, and analytics from one clean workspace.
@@ -299,7 +299,7 @@ export default function Landing() {
 
         <section className="landing-section landing-value-section">
           <div className="section-header">
-            <span className="section-label">Why WATI Clone</span>
+            <span className="section-label">Why ConvoNest</span>
             <h2>Centralized communication with the tools your team already needs.</h2>
           </div>
 
@@ -351,8 +351,8 @@ export default function Landing() {
         <div className="landing-footer-grid">
           <div className="landing-footer-brand">
             <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
-              <img src="/logo.png" alt="WATI Logo" style={{ height: '36px', width: 'auto', marginRight: '10px' }} />
-              <h2 style={{ margin: 0 }}>WATI <span>Clone</span></h2>
+              <img src="/logo.png" alt="ConvoNest Logo" style={{ height: '36px', width: 'auto', marginRight: '10px' }} />
+              <h2 style={{ margin: 0 }}>Convo<span>Nest</span></h2>
             </Link>
             <p>Centralized WhatsApp communication for modern teams.</p>
           </div>
@@ -390,7 +390,7 @@ export default function Landing() {
         </div>
 
         <div className="landing-footer-bottom">
-          © 2026 WATI Clone. All Rights Reserved.
+          © 2026 ConvoNest. All Rights Reserved.
         </div>
       </footer>
     </div>

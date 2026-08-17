@@ -7,7 +7,7 @@ const createDefaultForm = () => ({
   category: 'Marketing',
   language: 'English',
   status: 'PENDING',
-  body: 'Hello {{1}},\n\nYour order {{2}} has been confirmed.\n\nThank you for choosing WATI Clone.',
+  body: 'Hello {{1}},\n\nYour order {{2}} has been confirmed.\n\nThank you for choosing ConvoNest.',
 });
 
 function extractVariables(body = '') {

@@ -1,5 +1,5 @@
 {
-  "name": "wati-monorepo-root",
+  "name": "convonest-monorepo-root",
   "private": true,
   "scripts": {
     "build": "cd whatsapp-clone && npm install && npm run build"

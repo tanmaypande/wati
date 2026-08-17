@@ -8,7 +8,7 @@ function SettingsWhatsApp() {
 
   // Send Text Test Form
   const [textTo, setTextTo] = useState('');
-  const [textMsg, setTextMsg] = useState('Hello! This is a test message from WATI Clone WhatsApp API.');
+  const [textMsg, setTextMsg] = useState('Hello! This is a test message from ConvoNest WhatsApp API.');
   const [textLoading, setTextLoading] = useState(false);
   const [textResult, setTextResult] = useState(null);
   const [textError, setTextError] = useState('');

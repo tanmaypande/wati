@@ -7,9 +7,9 @@ function Footer() {
       <div className="footer-container">
         <div className="footer-logo">
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'inline-flex', alignItems: 'center' }}>
-            <img src="/logo.png" alt="WATI Logo" style={{ height: '32px', width: 'auto', marginRight: '10px' }} />
+            <img src="/logo.png" alt="ConvoNest Logo" style={{ height: '32px', width: 'auto', marginRight: '10px' }} />
             <h2 style={{ margin: 0 }}>
-              WATI <span>Clone</span>
+              Convo<span>Nest</span>
             </h2>
           </Link>
           <p>Build Better Customer Conversations.</p>
@@ -23,7 +23,7 @@ function Footer() {
         </div>
 
         <div className="footer-copy">
-          © 2026 WATI Clone. All Rights Reserved.
+          © 2026 ConvoNest. All Rights Reserved.
         </div>
       </div>
     </footer>

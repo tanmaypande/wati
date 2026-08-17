@@ -96,7 +96,7 @@ export default function Login() {
 
         <div className="login-card">
           <div className="login-card-header">
-            <img src="/logo.png" alt="WATI Logo" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+            <img src="/logo.png" alt="ConvoNest Logo" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
             <div>
               <h2>Sign in</h2>
               <p>Access your dashboard and chat workspace</p>

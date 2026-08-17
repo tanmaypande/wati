@@ -27,9 +27,9 @@ function Sidebar({ open, onClose }) {
   return (
     <aside className={`sidebar ${open ? 'open' : ''}`} onClick={() => { if (onClose) onClose(); }}>
       <div className="sidebar-logo">
-        <img src="/logo.png" alt="WATI Logo" style={{ height: '36px', width: 'auto', marginRight: '10px' }} />
+        <img src="/logo.png" alt="ConvoNest Logo" style={{ height: '36px', width: 'auto', marginRight: '10px' }} />
         <h2>
-          WATI<span>Clone</span>
+          Convo<span>Nest</span>
         </h2>
       </div>
 

@@ -69,7 +69,7 @@ function TopBar({ onToggleSidebar }) {
         <button className="hamburger" aria-label="Toggle menu" onClick={() => onToggleSidebar && onToggleSidebar()}>
           ☰
         </button>
-        <img src="/logo.png" alt="WATI Logo" style={{ height: '32px', width: 'auto' }} />
+        <img src="/logo.png" alt="ConvoNest Logo" style={{ height: '32px', width: 'auto' }} />
         <div>
           <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Dashboard</h2>
           <p style={{ margin: 0, fontSize: '0.85rem' }}>Welcome back, {displayName} 👋</p>

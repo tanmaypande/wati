@@ -10,7 +10,7 @@ return (
     <Container fluid>
 
         <Navbar.Brand href="#">
-        <strong>WATI Clone</strong>
+        <strong>ConvoNest</strong>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbar" />
 

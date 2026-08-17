@@ -13,7 +13,7 @@ export default function SettingsWorkspace() {
 
       <div className="workspace-form">
         <label>Workspace Name</label>
-        <input value="WATI Clone" readOnly />
+        <input value="ConvoNest" readOnly />
 
         <label>Workspace ID</label>
         <input value="Not configured" readOnly />

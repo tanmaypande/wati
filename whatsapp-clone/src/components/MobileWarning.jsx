@@ -6,7 +6,7 @@ export default function MobileWarning() {
 
   useEffect(() => {
     try {
-      const dismissed = sessionStorage.getItem('watiMobileWarningDismissed');
+      const dismissed = sessionStorage.getItem('convonestMobileWarningDismissed');
       if (dismissed) return;
       if (window && window.innerWidth && window.innerWidth < 768) {
         setShow(true);
@@ -18,7 +18,7 @@ export default function MobileWarning() {
 
   const continueAnyway = () => {
     try {
-      sessionStorage.setItem('watiMobileWarningDismissed', '1');
+      sessionStorage.setItem('convonestMobileWarningDismissed', '1');
     } catch (err) {}
     setShow(false);
   };
@@ -29,7 +29,7 @@ export default function MobileWarning() {
     <div className="mobile-warning-overlay" role="dialog" aria-modal="true" aria-label="Desktop recommended">
       <div className="mobile-warning-card">
         <h2>Desktop Recommended</h2>
-        <p>This application is optimized for desktop and laptop screens. For the best experience, please open WATI on a desktop or laptop.</p>
+        <p>This application is optimized for desktop and laptop screens. For the best experience, please open ConvoNest on a desktop or laptop.</p>
         <div className="mobile-warning-actions">
           <button className="btn btn-outline-secondary" onClick={continueAnyway}>Continue Anyway</button>
         </div>
